@@ -1,4 +1,5 @@
-# blockycee
+# HyperLedgerFabric
+Captone project from Blockchain paper
 
 # COMP842 
 
@@ -6,8 +7,11 @@ This is a readme file to initalise the COMP842 workspace.
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
+- [HyperLedgerFabric](#hyperledgerfabric)
+- [COMP842](#comp842)
+	- [Table of Contents](#table-of-contents)
+	- [Overview](#overview)
+	- [Features](#features)
 
 ## Overview
 
