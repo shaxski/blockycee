@@ -12,6 +12,7 @@ This is a readme file to initalise the COMP842 workspace.
 	- [Table of Contents](#table-of-contents)
 	- [Overview](#overview)
 	- [Features](#features)
+	- [Prerequisite](#prerequisite)
 
 ## Overview
 
@@ -23,3 +24,11 @@ This project aims to understand how blockchain can be used to securely store and
 - User Stories
 - UI Designs
 - Programming foundations
+
+
+## Prerequisite
+
+ - Git
+ - cURL
+ - Docker
+ - Go
