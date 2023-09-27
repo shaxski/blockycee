@@ -45,7 +45,7 @@ This project aims to understand how blockchain can be used to securely store and
 
 ### Run a Network
 - `cd fabric-samples/test-network`
-- Run test network on docker by `./network up`
+- Run test network on docker by `./network.sh up`
 
   ```test network is composed of 2 peers, 1 orderer, 1 client```
 - you can check number of containers(4) by `docker ps -a`
