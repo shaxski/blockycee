@@ -1,0 +1,60 @@
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererOrg
+        MSPDir: crypto-config/ordererOrganizations/oculus.com/msp
+
+    - &Register1Org
+        Name: Register1Org
+        ID: Register1Org
+        MSPDir: crypto-config/peerOrganizations/register1.oculus.com/msp
+        AnchorPeers:
+            - Host: peer0.register1.oculus.com
+              Port: 7051
+
+    - &CustomerOrg
+        Name: CustomerOrg
+        ID: CustomerOrg
+        MSPDir: crypto-config/peerOrganizations/customer.oculus.com/msp
+        AnchorPeers:
+            - Host: peer0.customer.oculus.com
+              Port: 7051
+
+Orderer: &OrdererDefaults
+
+    OrdererType: solo
+    Addresses:
+        - orderer.oculus.com:7050
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+    Organizations:
+
+Application: &ApplicationDefaults
+    Organizations:
+    
+Profiles:
+
+    OrdererGenesis:
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *Register1Org
+                    - *CustomerOrg
+    Channel1:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Register1Org
+                - *CustomerOrg
