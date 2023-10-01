@@ -56,7 +56,7 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) pb.Response 
 		return s.getWallet(APIstub, args)
 	} else if function == "setCertification" { // Registry only
 		return s.setMusic(APIstub, args)
-	} else if function == "getUserCertification" { // either from Service provider and Registry
+	} else if function == "queryUserCertification" { // either from Service provider and Registry
 		return s.getAllMusic(APIstub)
 	}
 	fmt.Println("Please check your function : " + function)
