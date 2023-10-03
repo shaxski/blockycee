@@ -4,6 +4,7 @@ import sortKeysRecursive from 'sort-keys-recursive';
 import {Certification} from './certification';
 
 
+
 @Info({title: 'Certification Service', description: 'Smart contract for certification'})
 export class certificationServiceContract extends Contract {
 	@Transaction()
@@ -34,5 +35,29 @@ export class certificationServiceContract extends Contract {
 					await ctx.stub.putState(certification.CertifierId, Buffer.from(stringify(sortKeysRecursive(certification))));
 					console.info(`Asset ${certification.CertifierId} initialized`);
 			}
+	}
+
+	// CreateCertification issues a new certification to the world state with given details.
+	@Transaction()
+	public async CreateCertification(ctx: Context, payload:Certification): Promise<void> {
+			const exists = await this.CertificationExists(ctx, payload.CertifierId);
+			if (exists) {
+					throw new Error(`The asset ${payload.CertifierId} already exists`);
+			}
+
+			const certification = {
+				...payload
+			};
+
+			// we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
+			await ctx.stub.putState(payload.CertifierId, Buffer.from(stringify(sortKeysRecursive(certification))));
+	}
+
+	// CertificationExists returns true when certification with given CertifierId exists in world state.
+	@Transaction(false)
+	@Returns('boolean')
+	public async CertificationExists(ctx: Context, id: string): Promise<boolean> {
+			const assetJSON = await ctx.stub.getState(id);
+			return assetJSON && assetJSON.length > 0;
 	}
 }
