@@ -60,4 +60,14 @@ export class certificationServiceContract extends Contract {
 			const assetJSON = await ctx.stub.getState(id);
 			return assetJSON && assetJSON.length > 0;
 	}
+
+	// ReadCertification returns the certification stored in the world state with given id.
+	@Transaction(false)
+	public async ReadCertification(ctx: Context, id: string): Promise<string> {
+			const assetJSON = await ctx.stub.getState(id); // get the certification from chaincode state
+			if (!assetJSON || assetJSON.length === 0) {
+					throw new Error(`The asset ${id} does not exist`);
+			}
+			return assetJSON.toString();
+	}
 }
