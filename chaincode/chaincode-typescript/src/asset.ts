@@ -24,3 +24,20 @@ export class Asset {
     @Property()
     public AppraisedValue: number;
 }
+
+
+@Object()
+export class Certification {
+  @Property()
+  public docType?: string;
+	@Property()
+  public WalletId: string;
+	@Property()
+  public CertifierId: string ;
+	@Property()
+  public IssueDate: string ;
+	@Property()
+  public CertificateType: string;
+	@Property()
+  public ExpiryDate: string;
+}
