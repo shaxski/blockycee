@@ -3,10 +3,8 @@ import stringify from 'json-stringify-deterministic';
 import sortKeysRecursive from 'sort-keys-recursive';
 import {Certification} from './certification';
 
-
-
 @Info({title: 'Certification Service', description: 'Smart contract for certification'})
-export class certificationServiceContract extends Contract {
+export class CertificationServiceContract extends Contract {
 	@Transaction()
 	public async InitLedger(ctx: Context): Promise<void> {
 			const certifications: Certification[] = [
