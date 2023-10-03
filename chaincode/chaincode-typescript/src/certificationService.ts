@@ -11,16 +11,16 @@ export class CertificationServiceContract extends Contract {
 					{
 						WalletId: 'hashCodeUserWallet1',
 						CertifierId: 'randomSampleId1',
-						IssueDate: new Date('2023-10-03T12:00:00.000Z'),
+						IssueDate: '2023-10-03T12:00:00.000Z',
 						CertificateType: 'Type A',
-						ExpiryDate: new Date('2025-10-03T12:00:00.000Z'),
+						ExpiryDate: '2025-10-03T12:00:00.000Z',
 					},
 					{
 						WalletId: 'hashCodeUserWallet2',
 						CertifierId: 'randomSampleId2',
-						IssueDate: new Date('2022-01-03T12:00:00.000Z'),
+						IssueDate: '2022-01-03T12:00:00.000Z',
 						CertificateType: 'Type B',
-						ExpiryDate: new Date('2023-10-01T11:00:00.000Z'),
+						ExpiryDate: '2023-10-01T11:00:00.000Z',
 					},
 			];
 
@@ -67,5 +67,27 @@ export class CertificationServiceContract extends Contract {
 					throw new Error(`The certification ${id} does not exist`);
 			}
 			return certificationJSON.toString();
+	}
+	// GetAllAssets returns all assets found in the world state.
+	@Transaction(false)
+	@Returns('string')
+	public async GetAllAssets(ctx: Context): Promise<string> {
+			const allResults = [];
+			// range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
+			const iterator = await ctx.stub.getStateByRange('', '');
+			let result = await iterator.next();
+			while (!result.done) {
+					const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
+					let record;
+					try {
+							record = JSON.parse(strValue);
+					} catch (err) {
+							console.log(err);
+							record = strValue;
+					}
+					allResults.push(record);
+					result = await iterator.next();
+			}
+			return JSON.stringify(allResults);
 	}
 }

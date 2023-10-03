@@ -9,11 +9,11 @@ export class Certification {
 	@Property()
   public WalletId: string;
 	@Property()
-  public CertifierId: string ;
+  public CertifierId: string;
 	@Property()
-  public IssueDate: Date ;
+  public IssueDate: string;
 	@Property()
   public CertificateType: 'Type A' | 'Type B' | 'Type C';
 	@Property()
-  public ExpiryDate: Date;
+  public ExpiryDate: string;
 }

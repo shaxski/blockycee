@@ -12,7 +12,7 @@ const buildCCPOrg1 = (): Record<string, any> => {
     // load the common connection configuration file
     const ccpPath = path.resolve(__dirname, '..', '..', '..', '..', 'basic-network',
         'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
-    const fileExists = fs.existsSync(ccpPath);
+            const fileExists = fs.existsSync(ccpPath);
     if (!fileExists) {
         throw new Error(`no such file or directory: ${ccpPath}`);
     }
