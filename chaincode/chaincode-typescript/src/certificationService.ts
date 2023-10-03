@@ -30,8 +30,8 @@ export class CertificationServiceContract extends Contract {
 					// use convention of alphabetic order
 					// we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
 					// when retrieving data, in any lang, the order of data will be the same and consequently also the corresonding hash
-					await ctx.stub.putState(certification.CertifierId, Buffer.from(stringify(sortKeysRecursive(certification))));
-					console.info(`Asset ${certification.CertifierId} initialized`);
+				await ctx.stub.putState(certification.CertifierId, Buffer.from(stringify(sortKeysRecursive(certification))));
+				console.info(`Certification ${certification.CertifierId} initialized`);
 			}
 	}
 
@@ -40,7 +40,7 @@ export class CertificationServiceContract extends Contract {
 	public async CreateCertification(ctx: Context, payload:Certification): Promise<void> {
 			const exists = await this.CertificationExists(ctx, payload.CertifierId);
 			if (exists) {
-					throw new Error(`The asset ${payload.CertifierId} already exists`);
+					throw new Error(`The certification ${payload.CertifierId} already exists`);
 			}
 
 			const certification = {
@@ -55,17 +55,17 @@ export class CertificationServiceContract extends Contract {
 	@Transaction(false)
 	@Returns('boolean')
 	public async CertificationExists(ctx: Context, id: string): Promise<boolean> {
-			const assetJSON = await ctx.stub.getState(id);
-			return assetJSON && assetJSON.length > 0;
+			const certificationJSON = await ctx.stub.getState(id);
+			return certificationJSON && certificationJSON.length > 0;
 	}
 
 	// ReadCertification returns the certification stored in the world state with given id.
 	@Transaction(false)
 	public async ReadCertification(ctx: Context, id: string): Promise<string> {
-			const assetJSON = await ctx.stub.getState(id); // get the certification from chaincode state
-			if (!assetJSON || assetJSON.length === 0) {
-					throw new Error(`The asset ${id} does not exist`);
+			const certificationJSON = await ctx.stub.getState(id); // get the certification from chaincode state
+			if (!certificationJSON || certificationJSON.length === 0) {
+					throw new Error(`The certification ${id} does not exist`);
 			}
-			return assetJSON.toString();
+			return certificationJSON.toString();
 	}
 }
