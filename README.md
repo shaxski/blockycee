@@ -13,11 +13,10 @@ This is a readme file to initalise the COMP842 workspace.
 	- [Overview](#overview)
 	- [Features](#features)
 	- [Prerequisite](#prerequisite)
-	- [Procedure](#procedure)
-		- [Run a Network](#run-a-network)
-		- [Create a Channel](#create-a-channel)
+		- [Run a Network and Create a Channel and CA](#run-a-network-and-create-a-channel-and-ca)
 		- [Execute a chaincode](#execute-a-chaincode)
-		- [Network interaction](#network-interaction)
+		- [Network interaction (Application)](#network-interaction-application)
+		- [Clean network](#clean-network)
 
 ## Overview
 
@@ -39,31 +38,28 @@ This project aims to understand how blockchain can be used to securely store and
  - Go
 
 
-## Procedure
 
-- install fabric-samples by `./install-fabric.sh d s b ` 
-
-### Run a Network
-- `cd fabric-samples/test-network`
-- Run test network on docker by `./network.sh up`
-
-  ```test network is composed of 2 peers, 1 orderer, 1 client```
-- you can check number of containers(4) by `docker ps -a`
-
-
-### Create a Channel
+### Run a Network and Create a Channel and CA
 Channels are a private layer of communication between specific network members.
 Channel is a connection between organizations.
 
-- `./network.sh createChannel`
+!Execute under `basic-network` folder
+- `./network.sh up createChannel -c mychannel -ca`
  default channel name is "myChannel". `-c` option to change 
 
 
 ### Execute a chaincode 
-- `./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-go -ccl go`
+!Execute under `basic-network` folder
+- `./network.sh deployCC -ccn basic -ccp ../chaincode/chaincode-typescript/ -ccl typescript`
 
 
-### Network interaction
+### Network interaction (Application)
 Using peer CLI you can have network interaction such as invoke (update ledgers), channel update/install, create new smart contract
 
-Will update this later
+- `cd application`
+- `npm install`
+- `npm run start`
+
+
+### Clean network
+- `./network.sh down`
