@@ -60,6 +60,14 @@ const buildWallet = async (walletPath: string): Promise<Wallet> => {
     return wallet;
 };
 
+const readWallet = async(walletPath: string): Promise<Wallet> => {
+    // Check wallet exist and read
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    
+    return wallet
+}
+
+
 const prettyJSONString = (inputString: string): string => {
     if (inputString) {
          return JSON.stringify(JSON.parse(inputString), null, 2);
@@ -72,5 +80,6 @@ export {
     buildCCPOrg1,
     buildCCPOrg2,
     buildWallet,
+    readWallet,
     prettyJSONString,
 };

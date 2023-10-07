@@ -5,7 +5,7 @@
  */
 import { Gateway, GatewayOptions } from 'fabric-network';
 import * as path from 'path';
-import { buildCCPOrg1, buildWallet, prettyJSONString } from './utils/AppUtil';
+import { buildCCPOrg1, buildWallet, prettyJSONString, readWallet } from './utils/AppUtil';
 import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
 
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
@@ -72,14 +72,18 @@ async function main() {
         const caClient = buildCAClient(ccp, 'ca.org1.example.com');
 
         // setup the wallet to hold the credentials of the application user
-        const wallet = await buildWallet(walletPath);
+    
+        let wallet = await readWallet(walletPath);
+        if (!wallet) {
+                wallet = await buildWallet(walletPath)
+        }
 
         // in a real application this would be done on an administrative flow, and only once
-        await enrollAdmin(caClient, wallet, mspOrg1);
+        // await enrollAdmin(caClient, wallet, mspOrg1);
 
         // in a real application this would be done only when a new user was required to be added
         // and would be part of an administrative flow
-        await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
+        // await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
 
         // Create a new gateway instance for interacting with the fabric network.
         // In a real application this would be done as the backend server session is setup for
@@ -171,3 +175,5 @@ async function main() {
 }
 
 main();
+
+
