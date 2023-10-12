@@ -75,15 +75,16 @@ async function main() {
     
         let wallet = await readWallet(walletPath);
         if (!wallet) {
-                wallet = await buildWallet(walletPath)
+            wallet = await buildWallet(walletPath)
+            // in a real application this would be done on an administrative flow, and only once
+            await enrollAdmin(caClient, wallet, mspOrg1);
+
+            // in a real application this would be done only when a new user was required to be added
+            // and would be part of an administrative flow
+            await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
         }
 
-        // in a real application this would be done on an administrative flow, and only once
-        // await enrollAdmin(caClient, wallet, mspOrg1);
-
-        // in a real application this would be done only when a new user was required to be added
-        // and would be part of an administrative flow
-        // await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
+    
 
         // Create a new gateway instance for interacting with the fabric network.
         // In a real application this would be done as the backend server session is setup for
@@ -123,6 +124,9 @@ async function main() {
             let result = await contract.evaluateTransaction('GetAllAssets');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
+
+            // await contract.submitTransaction('CreateUser', 'userInfo');
+            // console.log('*** Result: committed');
             // // Now let's try to submit a transaction.
             // // This will be sent to both peers and if both peers endorse the transaction, the endorsed proposal will be sent
             // // to the orderer to be committed by each of the peer's to the channel ledger.
