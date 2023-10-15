@@ -7,7 +7,7 @@ import { Gateway, GatewayOptions } from 'fabric-network';
 import * as path from 'path';
 import { buildCCPOrg1, buildWallet, prettyJSONString, readWallet } from './utils/AppUtil';
 import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
-
+import crypto from 'crypto'
 
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
@@ -19,6 +19,25 @@ const org1UserId = 'typescriptAppUser';
 
 
 async function main() {
+    const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+        publicKeyEncoding: {
+          type: 'spki',
+          format: 'pem'
+        },
+        privateKeyEncoding: {
+          type: 'pkcs8',
+          format: 'pem'
+        }
+      });
+    const str = "Hey. this is a string!";
+    const buff = Buffer.from(str, "utf-8");
+    const encryptData=  crypto.publicEncrypt(publicKey, buff);
+    console.log('encryptData', encryptData);
+
+    const decryptData= crypto.privateDecrypt(privateKey,encryptData)
+    console.log('decryptData', decryptData.toString());
+    
     try {
         // build an in memory object with the network configuration (also known as a connection profile)
         const ccp = buildCCPOrg1();
