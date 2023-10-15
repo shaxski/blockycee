@@ -9,7 +9,6 @@ const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 
 const walletPath = path.join(__dirname, 'wallet');
-const userWalletPath = path.join(__dirname, 'wallet', 'user')
 
 
 const app: Express = express();
@@ -46,7 +45,7 @@ app.post('/registerUser', async(req: Request, res: Response) => {
 	// setup the wallet to hold the credentials of the application user
 	try {
 		
-		const wallet = await buildWallet(userWalletPath);
+		const wallet = await buildWallet(walletPath);
 
 		// in a real application this would be done only when a new user was required to be added
 		// and would be part of an administrative flow
@@ -63,6 +62,9 @@ app.post('/registerUser', async(req: Request, res: Response) => {
 
 app.post('/recordCertification', async(req: Request, res: Response) => {
 
+	// User create private and public key on their app and send public as payload 
+	// This will persist on chain when recordCertification api call
+	// Laster during verification Other organization will use these public to validate data.
 	const { CertifierId, CertificationId,IssueDate,CertificateType,ExpiryDate, ...params }:CertificationRequest = req.body;
 
 	const data = {
