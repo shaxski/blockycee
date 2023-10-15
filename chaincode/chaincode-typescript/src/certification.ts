@@ -1,29 +1,14 @@
 
 import {Object, Property} from 'fabric-contract-api';
 
-
-{
-  CertificationId: string,
-  Signature: "asdfasdfasdfasdf2erA#$SRF"
-  {
-    verification: "yes, this is me {name}"
-    CertifierId: "Org1"
-  } // encrypt with privatekey
-
-}
-
 @Object()
 export class Certification {
   @Property()
-  public docType?: string;
-  @Property()
-  public publicKey: string;
-	@Property()
-  public WalletId: string;
+  public PublicKey?: string;
 	@Property()
   public CertifierId: string; // unique
   @Property()
-  public CertificationId: uuid; //unique
+  public CertificationId: string; //unique
 	@Property()
   public IssueDate: string;
 	@Property()
