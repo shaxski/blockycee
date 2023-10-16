@@ -8,37 +8,6 @@ import lodash from 'lodash'
 @Info({title: 'Certification Service', description: 'Smart contract for certification'})
 export class CertificationServiceContract extends Contract {
 
-
-	/**
-	 * InitLedger 
-	 * 
-	 * @param ctx Context
-	 * @returns Prmoise<void>
-	 */
-	@Transaction()
-	public async InitLedger(ctx: Context): Promise<void> {
-		// This is sample Certification to test query
-		const certifications: Certification[] = [
-				{
-					CertifierId: 'randomSampleId1',
-					IssueDate: '2023-10-03T12:00:00.000Z',
-					CertificateType: 'Type A',
-					ExpiryDate: '2025-10-03T12:00:00.000Z',
-					PublicKey: 'tasdfasd',
-					CertificationId: 'ProCertId'
-				},
-		];
-
-		for (const certification of certifications) {
-			// example of how to write to world state deterministically
-			// use convention of alphabetic order
-			// we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
-			// when retrieving data, in any lang, the order of data will be the same and consequently also the corresonding hash
-			await ctx.stub.putState(certification.CertificationId, Buffer.from(stringify(sortKeysRecursive(certification))));
-			console.info(`Certification ${certification.CertificationId} initialized`);
-		}
-	}
-
 	/**
 	 * CreateCertification issues a new certification to the world state with given details.
 	 * 
