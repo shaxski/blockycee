@@ -2,6 +2,8 @@ import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api
 import stringify from 'json-stringify-deterministic';
 import sortKeysRecursive from 'sort-keys-recursive';
 import {Certification} from './certification';
+import crypto from 'crypto'
+import lodash from 'lodash'
 
 @Info({title: 'Certification Service', description: 'Smart contract for certification'})
 export class CertificationServiceContract extends Contract {
@@ -75,10 +77,47 @@ export class CertificationServiceContract extends Contract {
 	 */
 	@Transaction(false)
 	@Returns('boolean')
-	public async CertificationExists(ctx: Context, id: string): Promise<boolean> {
+	private async CertificationExists(ctx: Context, id: string): Promise<boolean> {
 		const certificationJSON = await ctx.stub.getState(id);
 		return certificationJSON && certificationJSON.length > 0;
 	}
+
+	/**
+	 * VerifyCertification
+	 * 
+	 * @param ctx Context
+	 * @param payload Stringified payload
+	 * @returns Promise<boolean>
+	 */
+	@Transaction(false)
+	@Returns('boolean')
+	public async VerifyCertification(ctx: Context, payload:string): Promise<boolean> {
+		const parsePayload:{
+			CertificationId: string;
+			SignedData: Buffer;
+		} = JSON.parse(payload)
+
+		const certificationBuffer = await ctx.stub.getState(parsePayload.CertificationId); // get the certification from chaincode state
+
+		if (!certificationBuffer || certificationBuffer.length === 0) {
+				throw new Error(`The certification ${parsePayload.CertificationId} does not exist`);
+		}
+		const certificationJson: Certification = JSON.parse(certificationBuffer.toString())
+
+		const decryptData = crypto.publicDecrypt(certificationJson.PublicKey, parsePayload.SignedData)
+		const parsedData: Certification = JSON.parse(decryptData.toString())
+    const decryptCertificationJson = {
+			...certificationJson,
+			...parsedData
+		}
+
+		if(lodash.isEqual(certificationJson,decryptCertificationJson)) {
+			return true
+		}
+		
+		return false
+	}
+
 
 	/**
 	 * GetCertificationById
