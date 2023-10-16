@@ -9,10 +9,16 @@ const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 
 const walletPath = path.join(__dirname, 'wallet');
+const userWalletPath = path.join(__dirname, 'wallet-user')
 
 
 const app: Express = express();
 const port = 3000;
+
+// Middleware
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+
 
 const ccp = buildCCPOrg1();
       
@@ -39,19 +45,21 @@ app.post('/registerAdmin', async(req: Request, res: Response) => {
 })
 
 app.post('/registerUser', async(req: Request, res: Response) => {
+	console.log('req',req.body);
+	
 	const {orgName='Org1MSP', userId='testUser1'} = req.body; // const mspOrg1 = 'Org1MSP',  const org1UserId = 'typescriptAppUser';
 
 
 	// setup the wallet to hold the credentials of the application user
 	try {
 		
-		const wallet = await buildWallet(walletPath);
-
+		const userWallet = await buildWallet(userWalletPath);
+		const adminWallet = await readWallet(walletPath)
 		// in a real application this would be done only when a new user was required to be added
 		// and would be part of an administrative flow
 
 		// Check user Identity exist first and register
-		await registerAndEnrollUser(caClient, wallet, orgName, userId, 'org1.department1');
+		await registerAndEnrollUser(caClient, adminWallet, userWallet, orgName, userId, 'org1.department1');
 	} catch (error) {
 		throw new Error("Error: Wallet creation failed");
 	}
@@ -73,9 +81,9 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 
 
 	try {
-		let wallet = await readWallet(walletPath);
+		let adminWallet = await readWallet(walletPath);
 		const gatewayOpts: GatewayOptions = {
-			wallet,
+			wallet: adminWallet,
 			identity: 'admin',
 			discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
 		};
@@ -126,13 +134,11 @@ app.get('/certification/:id', async(req: Request, res: Response) => {
 		let result = await contract.evaluateTransaction('GetCertificationById', certificationId);
 		console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
-		res.send(prettyJSONString(result.toString()));
+		res.status(200).json(JSON.parse(result.toString()));
 
 	} catch (error) {
 		throw new Error("failed");
-		
 	}
-	res.send('Certification created successfully');
 
 })
 

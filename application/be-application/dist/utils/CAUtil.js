@@ -60,23 +60,23 @@ const enrollAdmin = (caClient, wallet, orgMspId) => __awaiter(void 0, void 0, vo
     }
 });
 exports.enrollAdmin = enrollAdmin;
-const registerAndEnrollUser = (caClient, wallet, orgMspId, userId, affiliation) => __awaiter(void 0, void 0, void 0, function* () {
+const registerAndEnrollUser = (caClient, adminWallet, userWallet, orgMspId, userId, affiliation) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check to see if we've already enrolled the user
-        const userIdentity = yield wallet.get(userId);
+        const userIdentity = yield userWallet.get(userId);
         if (userIdentity) {
             console.log(`An identity for the user ${userId} already exists in the wallet`);
             return;
         }
         // Must use an admin to register a new user
-        const adminIdentity = yield wallet.get(adminUserId);
+        const adminIdentity = yield adminWallet.get(adminUserId);
         if (!adminIdentity) {
             console.log('An identity for the admin user does not exist in the wallet');
             console.log('Enroll the admin user before retrying');
             return;
         }
         // build a user object for authenticating with the CA
-        const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
+        const provider = adminWallet.getProviderRegistry().getProvider(adminIdentity.type);
         const adminUser = yield provider.getUserContext(adminIdentity, adminUserId);
         // Register the user, enroll the user, and import the new identity into the wallet.
         // if affiliation is specified by client, the affiliation value must be configured in CA
@@ -97,7 +97,7 @@ const registerAndEnrollUser = (caClient, wallet, orgMspId, userId, affiliation) 
             mspId: orgMspId,
             type: 'X.509',
         };
-        yield wallet.put(userId, x509Identity);
+        yield userWallet.put(userId, x509Identity);
         console.log(`Successfully registered and enrolled user ${userId} and imported it into the wallet`);
     }
     catch (error) {

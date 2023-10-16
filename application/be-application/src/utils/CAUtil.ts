@@ -50,17 +50,17 @@ const enrollAdmin = async (caClient: FabricCAServices, wallet: Wallet, orgMspId:
     }
 };
 
-const registerAndEnrollUser = async (caClient: FabricCAServices, wallet: Wallet, orgMspId: string, userId: string, affiliation: string): Promise<void> => {
+const registerAndEnrollUser = async (caClient: FabricCAServices,adminWallet: Wallet, userWallet: Wallet, orgMspId: string, userId: string, affiliation: string): Promise<void> => {
     try {
         // Check to see if we've already enrolled the user
-        const userIdentity = await wallet.get(userId);
+        const userIdentity = await userWallet.get(userId);
         if (userIdentity) {
             console.log(`An identity for the user ${userId} already exists in the wallet`);
             return;
         }
 
         // Must use an admin to register a new user
-        const adminIdentity = await wallet.get(adminUserId);
+        const adminIdentity = await adminWallet.get(adminUserId);
         if (!adminIdentity) {
             console.log('An identity for the admin user does not exist in the wallet');
             console.log('Enroll the admin user before retrying');
@@ -68,7 +68,7 @@ const registerAndEnrollUser = async (caClient: FabricCAServices, wallet: Wallet,
         }
 
         // build a user object for authenticating with the CA
-        const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
+        const provider = adminWallet.getProviderRegistry().getProvider(adminIdentity.type);
         const adminUser = await provider.getUserContext(adminIdentity, adminUserId);
 
         // Register the user, enroll the user, and import the new identity into the wallet.
@@ -90,7 +90,7 @@ const registerAndEnrollUser = async (caClient: FabricCAServices, wallet: Wallet,
             mspId: orgMspId,
             type: 'X.509',
         };
-        await wallet.put(userId, x509Identity);
+        await userWallet.put(userId, x509Identity);
         console.log(`Successfully registered and enrolled user ${userId} and imported it into the wallet`);
     } catch (error) {
         console.error(`Failed to register user : ${error}`);
