@@ -37,6 +37,8 @@ async function main() {
 
     const decryptData= crypto.privateDecrypt(privateKey,encryptData)
     console.log('decryptData', decryptData.toString());
+    console.log(publicKey);
+    
     
     try {
         // build an in memory object with the network configuration (also known as a connection profile)
@@ -49,18 +51,18 @@ async function main() {
         // setup the wallet to hold the credentials of the application user
         
 
-        // let wallet = await buildWallet(walletPath)
+        let wallet = await buildWallet(walletPath)
         // // in a real application this would be done on an administrative flow, and only once
-        // await enrollAdmin(caClient, wallet, mspOrg1);
+        await enrollAdmin(caClient, wallet, mspOrg1);
 
         
         // // in a real application this would be done only when a new user was required to be added
         // // and would be part of an administrative flow
-        // await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
+        await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
         
 
         // If wallet is created then comment out above and use bottom line to use existing wallet
-        let wallet = await readWallet(walletPath);
+        // let wallet = await readWallet(walletPath);
         
         // Create a new gateway instance for interacting with the fabric network.
         // In a real application this would be done as the backend server session is setup for
