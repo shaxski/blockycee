@@ -137,27 +137,4 @@ export class CertificationServiceContract extends Contract {
 		
 		return certificationJSON.toString()
 	}
-
-	// GetAllCertification returns all certification found in the world state.
-	@Transaction(false)
-	@Returns('string')
-	public async GetAllCertification(ctx: Context): Promise<string> {
-		const allResults = [];
-		// range query with empty string for startKey and endKey does an open-ended query of all certifications in the chaincode namespace.
-		const iterator = await ctx.stub.getStateByRange('', '');
-		let result = await iterator.next();
-		while (!result.done) {
-				const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
-				let record;
-				try {
-						record = JSON.parse(strValue);
-				} catch (err) {
-						console.log(err);
-						record = strValue;
-				}
-				allResults.push(record);
-				result = await iterator.next();
-		}
-		return JSON.stringify(allResults);
-	}
 }
