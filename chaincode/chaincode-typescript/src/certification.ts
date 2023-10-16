@@ -6,9 +6,9 @@ export class Certification {
   @Property()
   public PublicKey?: string;
 	@Property()
-  public CertifierId: string; // unique
+  public CertifierId: string; // unique Company or Organization ID
   @Property()
-  public CertificationId: string; //unique
+  public CertificationId: string; //unique User Certification ID
 	@Property()
   public IssueDate: string;
 	@Property()
