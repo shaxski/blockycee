@@ -71,22 +71,40 @@ export class CertificationServiceContract extends Contract {
 		if (!certificationBuffer || certificationBuffer.length === 0) {
 				throw new Error(`The certification ${parsePayload.CertificationId} does not exist`);
 		}
-		const certificationJson: Certification = JSON.parse(certificationBuffer.toString())
 
-		const decryptData = crypto.publicDecrypt(certificationJson.PublicKey, parsePayload.SignedData)
-		const parsedData: Certification = JSON.parse(decryptData.toString())
+		
+		const certificationJson: Certification = JSON.parse(certificationBuffer.toString());
+		const isValid = this.ValidateCertification(certificationJson);
+
+		if (!isValid) {
+			throw new Error(`The certification ${parsePayload.CertificationId} is no more valid`);
+		}
+
+		const decryptData = crypto.publicDecrypt(certificationJson.PublicKey, parsePayload.SignedData);
+		const parsedData: Certification = JSON.parse(decryptData.toString());
     const decryptCertificationJson = {
 			...certificationJson,
 			...parsedData
-		}
+		};
 
 		if(lodash.isEqual(certificationJson,decryptCertificationJson)) {
-			return true
+			return true;
 		}
 		
-		return false
+		return false;
 	}
 
+
+	private ValidateCertification(certification: Certification): boolean {
+
+		const today = new Date();
+		const expiry = new Date(certification.ExpiryDate);
+		
+		if (today < expiry) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * GetCertificationById
