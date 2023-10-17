@@ -62,7 +62,7 @@ export class CertificationServiceContract extends Contract {
 	public async VerifyCertification(ctx: Context, payload:string): Promise<boolean> {
 		const parsePayload:{
 			CertificationId: string;
-			SignedData: Buffer;
+			SignedData: string;
 		} = JSON.parse(payload);
 
 		const certificationBuffer = await ctx.stub.getState(parsePayload.CertificationId); // get the certification from chaincode state
@@ -79,7 +79,7 @@ export class CertificationServiceContract extends Contract {
 			throw new Error(`The certification ${parsePayload.CertificationId} is no more valid`);
 		}
 
-		const decryptData = crypto.publicDecrypt(certificationJson.PublicKey, parsePayload.SignedData);
+		const decryptData = crypto.publicDecrypt(certificationJson.PublicKey, Buffer.from(parsePayload.SignedData, 'base64'));
 		const parsedData: Certification = JSON.parse(decryptData.toString());
     const decryptCertificationJson = {
 			...certificationJson,
