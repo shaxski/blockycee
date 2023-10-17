@@ -90,7 +90,10 @@ const registerAndEnrollUser = async (caClient: FabricCAServices, wallet: Wallet,
             mspId: orgMspId,
             type: 'X.509',
         };
+            
         await wallet.put(userId, x509Identity);
+        // const publicKey = await enrollment.key.getPublicKey()
+
         console.log(`Successfully registered and enrolled user ${userId} and imported it into the wallet`);
     } catch (error) {
         console.error(`Failed to register user : ${error}`);

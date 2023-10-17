@@ -12,10 +12,12 @@
                 "fabric-contract-api": "^2.4.0",
                 "fabric-shim": "^2.4.0",
                 "json-stringify-deterministic": "^1.0.1",
+                "lodash": "^4.17.21",
                 "sort-keys-recursive": "^2.1.2"
             },
             "devDependencies": {
                 "@types/chai": "^4.1.7",
+                "@types/lodash": "^4.14.199",
                 "@types/mocha": "^5.2.5",
                 "@types/node": "^12.20.55",
                 "@types/sinon": "^5.0.7",
@@ -624,6 +626,12 @@
             "version": "3.15.6",
             "resolved": "https://registry.npmjs.org/@types/google-protobuf/-/google-protobuf-3.15.6.tgz",
             "integrity": "sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw=="
+        },
+        "node_modules/@types/lodash": {
+            "version": "4.14.199",
+            "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.199.tgz",
+            "integrity": "sha512-Vrjz5N5Ia4SEzWWgIVwnHNEnb1UE1XMkvY5DGXrAeOGE9imk0hgTHh5GyDjLDJi9OTCn9oo9dXH1uToK1VRfrg==",
+            "dev": true
         },
         "node_modules/@types/long": {
             "version": "4.0.2",
@@ -1880,8 +1888,7 @@
         "node_modules/lodash": {
             "version": "4.17.21",
             "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
-            "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
-            "dev": true
+            "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
         },
         "node_modules/lodash.camelcase": {
             "version": "4.3.0",
@@ -4269,6 +4276,12 @@
             "resolved": "https://registry.npmjs.org/@types/google-protobuf/-/google-protobuf-3.15.6.tgz",
             "integrity": "sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw=="
         },
+        "@types/lodash": {
+            "version": "4.14.199",
+            "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.199.tgz",
+            "integrity": "sha512-Vrjz5N5Ia4SEzWWgIVwnHNEnb1UE1XMkvY5DGXrAeOGE9imk0hgTHh5GyDjLDJi9OTCn9oo9dXH1uToK1VRfrg==",
+            "dev": true
+        },
         "@types/long": {
             "version": "4.0.2",
             "resolved": "https://registry.npmjs.org/@types/long/-/long-4.0.2.tgz",
@@ -5258,8 +5271,7 @@
         "lodash": {
             "version": "4.17.21",
             "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
-            "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
-            "dev": true
+            "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
         },
         "lodash.camelcase": {
             "version": "4.3.0",
