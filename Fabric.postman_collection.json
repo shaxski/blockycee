@@ -1,0 +1,138 @@
+{
+	"info": {
+		"_postman_id": "6fb9a49f-e06e-4603-bc43-97a5ef5f9c09",
+		"name": "Fabric",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register Admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{BE-URL}}/registerAdmin",
+					"host": [
+						"{{BE-URL}}"
+					],
+					"path": [
+						"registerAdmin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"orgName\":\"Org1MSP\",\n    \"userId\":\"kai\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BE-URL}}/registerUser",
+					"host": [
+						"{{BE-URL}}"
+					],
+					"path": [
+						"registerUser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Certification",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"CertifierId\": \"Organization AUT\",\n    \"IssueDate\": \"2023-10-03T12:00:00.000Z\",\n    \"CertificateType\": \"Type A\",\n    \"ExpiryDate\": \"2025-10-03T12:00:00.000Z\",\n    \"PublicKey\": \"LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF5SFd1RmZHMEt0T3BtZnkxMnVWbQo3bjdYMG1DVlFyY0EzYzU4SnUrZ1p1bmdpa1dOd0lZZkNNQUpMMjF2bHJRV3dXMUVBcnU5QlZ6Sy9aWUkxTUNpCm1FdHZTZnNUZ0dNcTN3MzZOVkNDR204RWY4NTlKY1JJTEU2QmIzY0w2NVc0MW5jNG5YOTBwd24yL1VyNGlCMzAKQW5BNDNuTHJtRkhBYWRja2E5UUxEK2REZ3ZWUEMvN25qaTA5MEI0NFVDaklrVWJIS25FVTF5TitzcVVSZFBQNApzcTh6TFhqb2VLaENRb0ttR1FhSktRdU1ZUEJxMUFVOTNqRHhMbHFHS29MMloxU21lMC9tRGdNcUZ6MThQOVJlCnBXbXRNdDRiNDUxWXNSQksrR3pidFJHN0dHcHpZMEdTTmxwRHdIRm5Ec0VVNUd3WlVBelo2eFQ5dlRsVlhuRmsKblFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==\",\n    \"CertificationId\": \"ProCertId-Kai\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BE-URL}}/recordCertification",
+					"host": [
+						"{{BE-URL}}"
+					],
+					"path": [
+						"recordCertification"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Certification by ID",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Certification Successful",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"CertificationId\": \"ProCertId-Kai1\",\n    \"SignedData\": \"mySKL6P1G2lr/or0CkPl11ykFJTXpBFV6N0PC/WVY5W1CMqQbKfSIcujWst5aLRt5Y6hdu7ohQWGvf+S3Nj/AqKfx6tSbHaQSIcRp77wf42OZTOYNv8Z+6dpgnkn1g+q/5lzJiCk/Xk/m7ESLEeJEh5kurrXkswOc00NF4BZj4e5yUXgto5VHL5WrGK1muuJDEp+LNRzbOM4z8KP8vojiv/a+e8Awsk82M0FUFBxIWTfUw3tbto+8DVo0ROWdB/z+clZfYT4YyFEDkpZZLR7y0RTvkXciWKEAra5U5D+5NqThHtz8kQRJiaZx5DMAGcSuS/KchTaIVDit6W+lZVsEQ==\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BE-URL}}/verifyCertification",
+					"host": [
+						"{{BE-URL}}"
+					],
+					"path": [
+						"verifyCertification"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Certification Fail",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"CertificationId\": \"ProCertId-Kai1\",\n    \"SignedData\": \"Sq9tIVqs65kl8ywFL9VUX54j+DO3JCspnot/wgpUpiNLZyy+q6nazH2eD03b4sB7fMV8UcYVAavvL0I4Qib3+7Cl72J0M89wjQMtlNo4Ylt7kcgfD1Nm3sdMsvABmRy4SwgwMOKo8pFYMM1gbCOtIhn2JANYTmO1UQNCG4R79UVpRG1lEYHksnXWEYNXK9Vz5jSVOjCq018w31rHBscJTvnSCL5toMkttp+qg601jbD4OnEIntW6S4A++sFjEVls+ShJfms40XT1KgnnWpZg7YJ+jQUXAmfsHzeR4YASLf+Ym6g98boE6qGuy//g9EK75rXiHEZMPsNIQZDtCXxeSw==\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BE-URL}}/verityCertification",
+					"host": [
+						"{{BE-URL}}"
+					],
+					"path": [
+						"verityCertification"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
