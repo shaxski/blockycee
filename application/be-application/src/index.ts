@@ -143,6 +143,49 @@ app.get('/certification/:id', async(req: Request, res: Response) => {
 
 })
 
+app.post('/verityCertification', async(req: Request, res: Response) => {
+
+	// User create private and public key on their app and send public as payload 
+	// This will persist on chain when recordCertification api call
+	// Laster during verification Other organization will use these public to validate data.
+	const { CertificationId,SignedData } = req.body;
+
+	const data = {
+		...req.body
+	};
+	
+
+	try {
+		let wallet = await readWallet(adminWalletPath);
+		const gatewayOpts: GatewayOptions = {
+			wallet,
+			identity: 'admin',
+			discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+		};
+		
+		// setup the gateway instance
+		// The user will now be able to create connections to the fabric network and be able to
+		// submit transactions and query. All transactions submitted by this gateway will be
+		// signed by this user using the credentials stored in the wallet.
+		await gateway.connect(ccp, gatewayOpts);
+
+		// Build a network instance based on the channel where the smart contract is deployed
+		const network = await gateway.getNetwork(channelName);
+
+		// Get the contract from the network.
+		const contract = network.getContract(chaincodeName);
+
+		let result = await contract.evaluateTransaction('VerifyCertification', JSON.stringify(data));
+		console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
+		res.status(200).json(JSON.parse(result.toString()));
+	} catch (error) {
+		throw new Error("failed");
+		
+	}
+	res.send('Certification created successfully');
+})
+
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
