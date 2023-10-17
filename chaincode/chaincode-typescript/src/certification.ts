@@ -4,7 +4,7 @@ import {Object, Property} from 'fabric-contract-api';
 @Object()
 export class Certification {
   @Property()
-  public PublicKey: string;
+  public PublicKey?: string;
 	@Property()
   public CertifierId: string; // unique Company or Organization ID
   @Property()

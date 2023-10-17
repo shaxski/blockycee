@@ -8,8 +8,8 @@ import { CertificationRequest } from './utils/Models';
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 
-const walletPath = path.join(__dirname, 'wallet');
-const userWalletPath = path.join(__dirname, 'wallet-user')
+const adminWalletPath = path.join(__dirname, 'adminwallet');
+const userWalletPath = path.join(__dirname, 'userWallet')
 
 
 const app: Express = express();
@@ -33,7 +33,7 @@ app.post('/registerAdmin', async(req: Request, res: Response) => {
 	// setup the wallet to hold the credentials of the application admin user
 	try {
 	
-		const wallet = await buildWallet(walletPath);
+		const wallet = await buildWallet(adminWalletPath);
 		// in a real application this would be done on an administrative flow, and only once
 		await enrollAdmin(caClient, wallet, orgName);
 
@@ -41,7 +41,7 @@ app.post('/registerAdmin', async(req: Request, res: Response) => {
 		throw new Error("Error: Wallet creation failed");
 	}
 
-	res.send('Wallet created successfully');
+	res.send('Admin wallet created successfully');
 })
 
 app.post('/registerUser', async(req: Request, res: Response) => {
@@ -54,7 +54,7 @@ app.post('/registerUser', async(req: Request, res: Response) => {
 	try {
 		
 		const userWallet = await buildWallet(userWalletPath);
-		const adminWallet = await readWallet(walletPath)
+		const adminWallet = await readWallet(adminWalletPath)
 		// in a real application this would be done only when a new user was required to be added
 		// and would be part of an administrative flow
 
@@ -78,15 +78,16 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 	const data = {
 		...req.body
 	};
-
+	
 
 	try {
-		let adminWallet = await readWallet(walletPath);
+		let wallet = await readWallet(adminWalletPath);
 		const gatewayOpts: GatewayOptions = {
-			wallet: adminWallet,
+			wallet,
 			identity: 'admin',
 			discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
 		};
+		
 		// setup the gateway instance
 		// The user will now be able to create connections to the fabric network and be able to
 		// submit transactions and query. All transactions submitted by this gateway will be
@@ -113,7 +114,7 @@ app.get('/certification/:id', async(req: Request, res: Response) => {
 	const certificationId = req.params.id;
 
 	try {
-		let wallet = await readWallet(walletPath);
+		let wallet = await readWallet(adminWalletPath);
 		const gatewayOpts: GatewayOptions = {
 			wallet,
 			identity: 'admin',

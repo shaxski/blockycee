@@ -53,8 +53,8 @@ const AppUtil_1 = require("./utils/AppUtil");
 const CAUtil_1 = require("./utils/CAUtil");
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
-const walletPath = path.join(__dirname, 'wallet');
-const userWalletPath = path.join(__dirname, 'wallet-user');
+const adminWalletPath = path.join(__dirname, 'adminwallet');
+const userWalletPath = path.join(__dirname, 'userWallet');
 const app = (0, express_1.default)();
 const port = 3000;
 // Middleware
@@ -69,14 +69,14 @@ app.post('/registerAdmin', (req, res) => __awaiter(void 0, void 0, void 0, funct
     const orgName = 'Org1MSP'; // req.body
     // setup the wallet to hold the credentials of the application admin user
     try {
-        const wallet = yield (0, AppUtil_1.buildWallet)(walletPath);
+        const wallet = yield (0, AppUtil_1.buildWallet)(adminWalletPath);
         // in a real application this would be done on an administrative flow, and only once
         yield (0, CAUtil_1.enrollAdmin)(caClient, wallet, orgName);
     }
     catch (error) {
         throw new Error("Error: Wallet creation failed");
     }
-    res.send('Wallet created successfully');
+    res.send('Admin wallet created successfully');
 }));
 app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('req', req.body);
@@ -84,7 +84,7 @@ app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, functi
     // setup the wallet to hold the credentials of the application user
     try {
         const userWallet = yield (0, AppUtil_1.buildWallet)(userWalletPath);
-        const adminWallet = yield (0, AppUtil_1.readWallet)(walletPath);
+        const adminWallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         // in a real application this would be done only when a new user was required to be added
         // and would be part of an administrative flow
         // Check user Identity exist first and register
@@ -101,13 +101,15 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
     // Laster during verification Other organization will use these public to validate data.
     const _a = req.body, { CertifierId, CertificationId, IssueDate, CertificateType, ExpiryDate } = _a, params = __rest(_a, ["CertifierId", "CertificationId", "IssueDate", "CertificateType", "ExpiryDate"]);
     const data = Object.assign({}, req.body);
+    console.log('data', data);
     try {
-        let adminWallet = yield (0, AppUtil_1.readWallet)(walletPath);
+        let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         const gatewayOpts = {
-            wallet: adminWallet,
+            wallet,
             identity: 'admin',
             discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
         };
+        console.log('wallet', wallet);
         // setup the gateway instance
         // The user will now be able to create connections to the fabric network and be able to
         // submit transactions and query. All transactions submitted by this gateway will be
@@ -127,7 +129,7 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
 app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const certificationId = req.params.id;
     try {
-        let wallet = yield (0, AppUtil_1.readWallet)(walletPath);
+        let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         const gatewayOpts = {
             wallet,
             identity: 'admin',
