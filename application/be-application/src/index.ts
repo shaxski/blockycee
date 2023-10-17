@@ -16,7 +16,7 @@ const app: Express = express();
 const port = 3000;
 
 // Middleware
-app.use(express.json())
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
@@ -42,7 +42,7 @@ app.post('/registerAdmin', async(req: Request, res: Response) => {
 	}
 
 	res.send('Admin wallet created successfully');
-})
+});
 
 app.post('/registerUser', async(req: Request, res: Response) => {
 	console.log('req',req.body);
@@ -66,7 +66,6 @@ app.post('/registerUser', async(req: Request, res: Response) => {
 
 	res.send('Wallet created successfully');
 });
-
 
 app.post('/recordCertification', async(req: Request, res: Response) => {
 
@@ -107,7 +106,7 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 	}
 	res.send('Certification created successfully');
 
-})
+});
 
 app.get('/certification/:id', async(req: Request, res: Response) => {
 
@@ -141,15 +140,16 @@ app.get('/certification/:id', async(req: Request, res: Response) => {
 		throw new Error("failed");
 	}
 
-})
+});
 
-app.post('/verityCertification', async(req: Request, res: Response) => {
+app.post('/verifyCertification', async(req: Request, res: Response) => {
 
 	// User create private and public key on their app and send public as payload 
 	// This will persist on chain when recordCertification api call
 	// Laster during verification Other organization will use these public to validate data.
-	const { CertificationId,SignedData } = req.body;
 
+	console.log('req.body', req.body);
+	
 	const data = {
 		...req.body
 	};
@@ -180,11 +180,11 @@ app.post('/verityCertification', async(req: Request, res: Response) => {
 
 		res.status(200).json(JSON.parse(result.toString()));
 	} catch (error) {
-		throw new Error("failed");
+		res.status(400).json(error);
 		
 	}
-	res.send('Certification created successfully');
-})
+	res.send('Certification verification successfully');
+});
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

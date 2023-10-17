@@ -101,7 +101,6 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
     // Laster during verification Other organization will use these public to validate data.
     const _a = req.body, { CertifierId, CertificationId, IssueDate, CertificateType, ExpiryDate } = _a, params = __rest(_a, ["CertifierId", "CertificationId", "IssueDate", "CertificateType", "ExpiryDate"]);
     const data = Object.assign({}, req.body);
-    console.log('data', data);
     try {
         let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         const gatewayOpts = {
@@ -109,7 +108,6 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
             identity: 'admin',
             discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
         };
-        console.log('wallet', wallet);
         // setup the gateway instance
         // The user will now be able to create connections to the fabric network and be able to
         // submit transactions and query. All transactions submitted by this gateway will be
@@ -151,6 +149,37 @@ app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
     catch (error) {
         throw new Error("failed");
     }
+}));
+app.post('/verifyCertification', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // User create private and public key on their app and send public as payload 
+    // This will persist on chain when recordCertification api call
+    // Laster during verification Other organization will use these public to validate data.
+    console.log('req.body', req.body);
+    const data = Object.assign({}, req.body);
+    try {
+        let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
+        const gatewayOpts = {
+            wallet,
+            identity: 'admin',
+            discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+        };
+        // setup the gateway instance
+        // The user will now be able to create connections to the fabric network and be able to
+        // submit transactions and query. All transactions submitted by this gateway will be
+        // signed by this user using the credentials stored in the wallet.
+        yield gateway.connect(ccp, gatewayOpts);
+        // Build a network instance based on the channel where the smart contract is deployed
+        const network = yield gateway.getNetwork(channelName);
+        // Get the contract from the network.
+        const contract = network.getContract(chaincodeName);
+        let result = yield contract.evaluateTransaction('VerifyCertification', JSON.stringify(data));
+        console.log(`*** Result: ${(0, AppUtil_1.prettyJSONString)(result.toString())}`);
+        res.status(200).json(JSON.parse(result.toString()));
+    }
+    catch (error) {
+        res.status(400).json(error);
+    }
+    res.send('Certification verification successfully');
 }));
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

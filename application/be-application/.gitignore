@@ -2,3 +2,4 @@ node_modules
 adminwallet
 userwallet
 *.pem
+dist

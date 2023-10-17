@@ -79,7 +79,7 @@ export class CertificationServiceContract extends Contract {
 			throw new Error(`The certification ${parsePayload.CertificationId} is no more valid`);
 		}
 
-		const decryptData = crypto.publicDecrypt(certificationJson.PublicKey, Buffer.from(parsePayload.SignedData, 'base64'));
+		const decryptData = crypto.publicDecrypt(Buffer.from(certificationJson.PublicKey,'base64').toString(), Buffer.from(parsePayload.SignedData, 'base64'));
 		const parsedData: Certification = JSON.parse(decryptData.toString());
     const decryptCertificationJson = {
 			...certificationJson,

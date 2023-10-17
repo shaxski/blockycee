@@ -29,12 +29,17 @@ console.log('decryptData', decryptData.toString());
 const data = {
 	"CertifierId": "Organization AUT",
 	"IssueDate": "2023-10-03T12:00:00.000Z",
-	"CertificateType": "Type A",
+	"CertificateType": "Type B",
 	"ExpiryDate": "2025-10-03T12:00:00.000Z",
-	"CertificationId": "ProCertId-Kai2"
+	"CertificationId": "ProCertId-Kai1"
 }
 const encryptWithPK = crypto.privateEncrypt(privateKey, Buffer.from(JSON.stringify(data), "utf-8")).toString('base64');
-
-console.log(publicKey.toString());
-
+const publicKeyBase64 = Buffer.from(publicKey).toString('base64')
+// console.log(publicKey);
+console.log('-------------------------------------------------------');
+console.log(publicKeyBase64);
+console.log('-------------------------------------------------------');
 console.log( encryptWithPK);
+// console.log('-------------------------------------------------------');
+// console.log(Buffer.from(publicKeyBase64,'base64').toString());
+
