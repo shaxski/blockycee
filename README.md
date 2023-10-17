@@ -1,5 +1,5 @@
 # HyperLedgerFabric
-Captone project from Blockchain paper
+The capstone project from COMP842 (Applied Blockchains and Cryptocurrencies) at Auckland University of Technology.
 
 # COMP842 
 
@@ -20,15 +20,14 @@ This is a readme file to initalise the COMP842 workspace.
 
 ## Overview
 
-This project aims to understand how blockchain can be used to securely store and verify qualifications for candididates.
+This project aims to understand how a consortium blockchain can be used to securely store and verify qualifications for candidates.
 
 ## Features
 
-- Literature Review
 - User Stories
+- Process Mapping
 - UI Designs
 - Programming foundations
-
 
 ## Prerequisite
 
@@ -36,7 +35,6 @@ This project aims to understand how blockchain can be used to securely store and
  - cURL
  - Docker
  - Go
-
 
 
 ### Run a Network and Create a Channel and CA
