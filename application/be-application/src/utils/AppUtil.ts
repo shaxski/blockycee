@@ -4,9 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Wallet, Wallets } from 'fabric-network';
+import { GatewayOptions, Wallet, Wallets, Gateway } from 'fabric-network';
 import * as fs from 'fs';
 import * as path from 'path';
+
+const channelName = process.env.CHANNEL_NAME || 'mychannel';
+const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
+
+const adminWalletPath = path.join(__dirname, 'adminwallet');
+const userWalletPath = path.join(__dirname, 'userWallet');
+
+const gateway = new Gateway();
 
 const buildCCPOrg1 = (): Record<string, any> => {
     // load the common connection configuration file
@@ -45,8 +53,7 @@ const buildCCPOrg2 = (): Record<string, any> => {
 const checkIdentity = async (walletPath: string, uuid: string): Promise<boolean> => {
     // Check to see if we've already enrolled the user
     const userIdentity = await readWallet(walletPath).then(wallet => wallet.get(uuid))
-    if (userIdentity) {
-        console.log(`An identity for the user ${uuid} already exists in the wallet`);
+    if (!userIdentity) {
         return false
     }
     return true

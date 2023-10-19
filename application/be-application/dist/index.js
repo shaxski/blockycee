@@ -51,6 +51,7 @@ const fabric_network_1 = require("fabric-network");
 const path = __importStar(require("path"));
 const AppUtil_1 = require("./utils/AppUtil");
 const CAUtil_1 = require("./utils/CAUtil");
+const short_uuid_1 = __importDefault(require("short-uuid"));
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 const adminWalletPath = path.join(__dirname, 'adminwallet');
@@ -66,41 +67,42 @@ const ccp = (0, AppUtil_1.buildCCPOrg1)();
 const caClient = (0, CAUtil_1.buildCAClient)(ccp, 'ca.org1.example.com');
 const gateway = new fabric_network_1.Gateway();
 app.post('/registerAdmin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const orgName = 'Org1MSP'; // req.body
+    const { orgName = 'Org1MSP', userId = 'admin' } = req.body;
     // setup the wallet to hold the credentials of the application admin user
     try {
         const wallet = yield (0, AppUtil_1.buildWallet)(adminWalletPath);
         // in a real application this would be done on an administrative flow, and only once
-        yield (0, CAUtil_1.enrollAdmin)(caClient, wallet, orgName);
+        yield (0, CAUtil_1.enrollAdmin)(caClient, wallet, orgName, userId);
+        res.status(200).send('Admin wallet created successfully');
     }
     catch (error) {
-        throw new Error("Error: Wallet creation failed");
+        console.log(error);
+        res.status(400).send("Error: Wallet creation failed");
     }
-    res.send('Admin wallet created successfully');
 }));
 app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('req', req.body);
-    const { orgName = 'Org1MSP', userId = 'testUser1' } = req.body; // const mspOrg1 = 'Org1MSP',  const org1UserId = 'typescriptAppUser';
+    const { orgName = 'Org1MSP', userId = 'Kai' } = req.body;
+    const uuid = short_uuid_1.default.generate();
     // setup the wallet to hold the credentials of the application user
     try {
         const userWallet = yield (0, AppUtil_1.buildWallet)(userWalletPath);
         const adminWallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
-        // in a real application this would be done only when a new user was required to be added
-        // and would be part of an administrative flow
         // Check user Identity exist first and register
-        yield (0, CAUtil_1.registerAndEnrollUser)(caClient, adminWallet, userWallet, orgName, userId, 'org1.department1');
+        yield (0, CAUtil_1.registerAndEnrollUser)(caClient, adminWallet, userWallet, orgName, uuid, 'org1.department1');
+        res.status(200).send(`${userId} is associated with digital ID: ${uuid}`);
     }
     catch (error) {
-        throw new Error("Error: Wallet creation failed");
+        console.log(error);
+        res.status(400).send("Error: Wallet creation failed");
     }
-    res.send('Wallet created successfully');
 }));
 app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // User create private and public key on their app and send public as payload 
-    // This will persist on chain when recordCertification api call
-    // Laster during verification Other organization will use these public to validate data.
-    const _a = req.body, { CertifierId, CertificationId, IssueDate, CertificateType, ExpiryDate } = _a, params = __rest(_a, ["CertifierId", "CertificationId", "IssueDate", "CertificateType", "ExpiryDate"]);
+    const _a = req.body, { DId, CertifierId, CertificationId, IssueDate, CertificateType, ExpiryDate, PublicKey } = _a, params = __rest(_a, ["DId", "CertifierId", "CertificationId", "IssueDate", "CertificateType", "ExpiryDate", "PublicKey"]);
     const data = Object.assign({}, req.body);
+    const isUserExist = (0, AppUtil_1.checkIdentity)(userWalletPath, DId);
+    if (!isUserExist) {
+        res.status(404).send("Digital Id not found");
+    }
     try {
         let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         const gatewayOpts = {
@@ -117,15 +119,25 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
         const network = yield gateway.getNetwork(channelName);
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
+        // const isRecordAlreadyExist = await contract.evaluateTransaction('GetCertificationByDId', DId);
+        // console.log('asdfasdf',isRecordAlreadyExist);
+        // if (isRecordAlreadyExist) {
+        // 	res.status(409).send(`Conflict error: record already exist with ${DId}`)
+        // }
         yield contract.submitTransaction('CreateCertification', JSON.stringify(data));
+        res.status(200).send('Certification created successfully');
     }
     catch (error) {
-        throw new Error("failed");
+        console.log(error);
+        res.status(400).send("Error: Fail to persist Certification");
     }
-    res.send('Certification created successfully');
 }));
 app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const certificationId = req.params.id;
+    const dId = req.params.id;
+    const isUserExist = (0, AppUtil_1.checkIdentity)(userWalletPath, dId);
+    if (!isUserExist) {
+        res.status(404).send("Digital Id not found");
+    }
     try {
         let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         const gatewayOpts = {
@@ -142,19 +154,23 @@ app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         const network = yield gateway.getNetwork(channelName);
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
-        let result = yield contract.evaluateTransaction('GetCertificationById', certificationId);
+        let result = yield contract.evaluateTransaction('GetCertificationByDId', dId);
         console.log(`*** Result: ${(0, AppUtil_1.prettyJSONString)(result.toString())}`);
         res.status(200).json(JSON.parse(result.toString()));
     }
     catch (error) {
-        throw new Error("failed");
+        console.log(error);
+        res.status(404).send("Error: Not Found");
     }
 }));
 app.post('/verifyCertification', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // User create private and public key on their app and send public as payload 
     // This will persist on chain when recordCertification api call
     // Laster during verification Other organization will use these public to validate data.
-    console.log('req.body', req.body);
+    const isUserExist = (0, AppUtil_1.checkIdentity)(userWalletPath, req.body.DId);
+    if (!isUserExist) {
+        res.status(404).send("Digital Id not found");
+    }
     const data = Object.assign({}, req.body);
     try {
         let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
@@ -174,12 +190,12 @@ app.post('/verifyCertification', (req, res) => __awaiter(void 0, void 0, void 0,
         const contract = network.getContract(chaincodeName);
         let result = yield contract.evaluateTransaction('VerifyCertification', JSON.stringify(data));
         console.log(`*** Result: ${(0, AppUtil_1.prettyJSONString)(result.toString())}`);
-        res.status(200).json(JSON.parse(result.toString()));
+        res.status(200).send('Certification verification successfully');
     }
     catch (error) {
+        console.log(error);
         res.status(400).json(error);
     }
-    res.send('Certification verification successfully');
 }));
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

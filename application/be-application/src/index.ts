@@ -38,12 +38,12 @@ app.post('/registerAdmin', async(req: Request, res: Response) => {
 		const wallet = await buildWallet(adminWalletPath);
 		// in a real application this would be done on an administrative flow, and only once
 		await enrollAdmin(caClient, wallet, orgName, userId);
-
+		res.status(200).send('Admin wallet created successfully');
 	} catch (error) {
+		console.log(error);
 		res.status(400).send("Error: Wallet creation failed");
 	}
 
-	res.status(200).send('Admin wallet created successfully');
 });
 
 app.post('/registerUser', async(req: Request, res: Response) => {
@@ -59,11 +59,12 @@ app.post('/registerUser', async(req: Request, res: Response) => {
 
 		// Check user Identity exist first and register
 		await registerAndEnrollUser(caClient, adminWallet, userWallet, orgName, uuid, 'org1.department1');
+		res.status(200).send(`${userId} is associated with digital ID: ${uuid}`);
 	} catch (error) {
+		console.log(error);
 		res.status(400).send("Error: Wallet creation failed");
 	}
 
-	res.status(200).send(`${userId} is associated with digital ID: ${uuid}`);
 });
 
 app.post('/recordCertification', async(req: Request, res: Response) => {
@@ -77,6 +78,7 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 	if (!isUserExist) {
 		res.status(404).send("Digital Id not found");
 	}
+
 	
 	try {
 		let wallet = await readWallet(adminWalletPath);
@@ -98,17 +100,31 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 		// Get the contract from the network.
 		const contract = network.getContract(chaincodeName);
 
+		// const isRecordAlreadyExist = await contract.evaluateTransaction('GetCertificationByDId', DId);
+
+		// console.log('asdfasdf',isRecordAlreadyExist);
+		
+		// if (isRecordAlreadyExist) {
+		// 	res.status(409).send(`Conflict error: record already exist with ${DId}`)
+		// }
+
 		await contract.submitTransaction('CreateCertification', JSON.stringify(data));
+		res.status(200).send('Certification created successfully');
 	} catch (error) {
+		console.log(error);
 		res.status(400).send("Error: Fail to persist Certification");
 	}
-	res.send('Certification created successfully');
 
 });
 
 app.get('/certification/:id', async(req: Request, res: Response) => {
 
 	const dId = req.params.id;
+
+	const isUserExist = checkIdentity(userWalletPath, dId)
+	if (!isUserExist) {
+		res.status(404).send("Digital Id not found");
+	}
 
 	try {
 		let wallet = await readWallet(adminWalletPath);
@@ -133,8 +149,8 @@ app.get('/certification/:id', async(req: Request, res: Response) => {
 		console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
 		res.status(200).json(JSON.parse(result.toString()));
-
 	} catch (error) {
+		console.log(error);
 		res.status(404).send("Error: Not Found");
 	}
 
@@ -181,8 +197,8 @@ app.post('/verifyCertification', async(req: Request, res: Response) => {
 
 		res.status(200).send('Certification verification successfully');
 	} catch (error) {
+		console.log(error);
 		res.status(400).json(error);
-		
 	}
 });
 
