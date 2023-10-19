@@ -24,17 +24,17 @@ const buildCAClient = (ccp: Record<string, any>, caHostName: string): FabricCASe
     return caClient;
 };
 
-const enrollAdmin = async (caClient: FabricCAServices, wallet: Wallet, orgMspId: string): Promise<void> => {
+const enrollAdmin = async (caClient: FabricCAServices, wallet: Wallet, orgMspId: string, userId:string): Promise<void> => {
     try {
         // Check to see if we've already enrolled the admin user.
-        const identity = await wallet.get(adminUserId);
+        const identity = await wallet.get(userId);
         if (identity) {
             console.log('An identity for the admin user already exists in the wallet');
             return;
         }
 
         // Enroll the admin user, and import the new identity into the wallet.
-        const enrollment = await caClient.enroll({ enrollmentID: adminUserId, enrollmentSecret: adminUserPasswd });
+        const enrollment = await caClient.enroll({ enrollmentID: userId, enrollmentSecret: adminUserPasswd });
         const x509Identity = {
             credentials: {
                 certificate: enrollment.certificate,
@@ -43,7 +43,7 @@ const enrollAdmin = async (caClient: FabricCAServices, wallet: Wallet, orgMspId:
             mspId: orgMspId,
             type: 'X.509',
         };
-        await wallet.put(adminUserId, x509Identity);
+        await wallet.put(userId, x509Identity);
         console.log('Successfully enrolled admin user and imported it into the wallet');
     } catch (error) {
         console.error(`Failed to enroll admin user : ${error}`);

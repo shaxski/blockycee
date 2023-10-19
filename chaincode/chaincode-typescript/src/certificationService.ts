@@ -18,9 +18,9 @@ export class CertificationServiceContract extends Contract {
 	@Transaction()
 	public async CreateCertification(ctx: Context, payload:string): Promise<void> {
 		const parsePayload:Certification = JSON.parse(payload);
-		const exists = await this.CertificationExists(ctx, parsePayload.CertificationId);
+		const exists = await this.CertificationExists(ctx, parsePayload.DId);
 		if (exists) {
-				throw new Error(`The certification ${parsePayload.CertifierId} already exists`);
+				throw new Error(`The certification for ${parsePayload.DId} already exists`);
 		}
 
 		const certification:Certification = {
@@ -29,7 +29,7 @@ export class CertificationServiceContract extends Contract {
 
 		try {
 			// we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
-			await ctx.stub.putState(parsePayload.CertificationId, Buffer.from(stringify(sortKeysRecursive(certification))));
+			await ctx.stub.putState(parsePayload.DId, Buffer.from(stringify(sortKeysRecursive(certification))));
 			
 		} catch (error) {
 			throw new Error(`Fail to persist data: ${payload}`);
@@ -45,8 +45,8 @@ export class CertificationServiceContract extends Contract {
 	 */
 	@Transaction(false)
 	@Returns('boolean')
-	public async CertificationExists(ctx: Context, id: string): Promise<boolean> {
-		const certificationJSON = await ctx.stub.getState(id);
+	public async CertificationExists(ctx: Context, did: string): Promise<boolean> {
+		const certificationJSON = await ctx.stub.getState(did);
 		return certificationJSON && certificationJSON.length > 0;
 	}
 
@@ -61,14 +61,14 @@ export class CertificationServiceContract extends Contract {
 	@Returns('boolean')
 	public async VerifyCertification(ctx: Context, payload:string): Promise<boolean> {
 		const parsePayload:{
-			CertificationId: string;
+			DId: string;
 			SignedData: string;
 		} = JSON.parse(payload);
 
-		const certificationBuffer = await ctx.stub.getState(parsePayload.CertificationId); // get the certification from chaincode state
+		const certificationBuffer = await ctx.stub.getState(parsePayload.DId); // get the certification from chaincode state
 
 		if (!certificationBuffer || certificationBuffer.length === 0) {
-				throw new Error(`The certification ${parsePayload.CertificationId} does not exist`);
+				throw new Error(`The certification ${parsePayload.DId} does not exist`);
 		}
 
 		
@@ -76,7 +76,7 @@ export class CertificationServiceContract extends Contract {
 		const isValid = this.ValidateCertification(certificationJson);
 
 		if (!isValid) {
-			throw new Error(`The certification ${parsePayload.CertificationId} is no more valid`);
+			throw new Error(`The certification ${parsePayload.DId} is no more valid`);
 		}
 
 		const decryptData = crypto.publicDecrypt(Buffer.from(certificationJson.PublicKey,'base64').toString(), Buffer.from(parsePayload.SignedData, 'base64'));
@@ -106,19 +106,19 @@ export class CertificationServiceContract extends Contract {
 	}
 
 	/**
-	 * GetCertificationById
+	 * GetCertificationByDId
 	 * 
 	 * @param ctx Context
-	 * @param id String
+	 * @param did String
 	 * @returns Promise<string>
 	 */
 	@Transaction(false)
 	@Returns('string')
-	public async GetCertificationById(ctx: Context, id:string): Promise<string> {
+	public async GetCertificationByDId(ctx: Context, did:string): Promise<string> {
 
-		const certificationJSON = await ctx.stub.getState(id); // get the certification from chaincode state
+		const certificationJSON = await ctx.stub.getState(did); // get the certification from chaincode state
 		if (!certificationJSON || certificationJSON.length === 0) {
-				throw new Error(`The certification ${id} does not exist`);
+				throw new Error(`The certification for ${did} does not exist`);
 		}
 		
 		return certificationJSON.toString();

@@ -1,8 +1,10 @@
 export type CertificationRequest = {
+	DId: string //unique
 	CertifierId: string; // unique
 	CertificationId: string; //unique
-	IssueDate: string;
 	CertificateType: 'Type A' | 'Type B' | 'Type C';
+	IssueDate: string;
 	ExpiryDate: string;
+	PublicKey: string;
 	[key:string]: string;
 }

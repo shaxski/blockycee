@@ -42,6 +42,16 @@ const buildCCPOrg2 = (): Record<string, any> => {
     return ccp;
 };
 
+const checkIdentity = async (walletPath: string, uuid: string): Promise<boolean> => {
+    // Check to see if we've already enrolled the user
+    const userIdentity = await readWallet(walletPath).then(wallet => wallet.get(uuid))
+    if (userIdentity) {
+        console.log(`An identity for the user ${uuid} already exists in the wallet`);
+        return false
+    }
+    return true
+}
+
 const buildWallet = async (walletPath: string): Promise<Wallet> => {
     // Create a new  wallet : Note that wallet is for managing identities.
     let wallet: Wallet;
@@ -82,4 +92,5 @@ export {
     buildWallet,
     readWallet,
     prettyJSONString,
+    checkIdentity
 };
