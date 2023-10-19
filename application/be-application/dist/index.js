@@ -52,13 +52,21 @@ const path = __importStar(require("path"));
 const AppUtil_1 = require("./utils/AppUtil");
 const CAUtil_1 = require("./utils/CAUtil");
 const short_uuid_1 = __importDefault(require("short-uuid"));
+const cors_1 = __importDefault(require("cors"));
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 const adminWalletPath = path.join(__dirname, 'adminwallet');
 const userWalletPath = path.join(__dirname, 'userWallet');
 const app = (0, express_1.default)();
 const port = 3000;
+// Add a list of allowed origins.
+// If you have more origins you would like to add, you can add them to the array below.
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+const options = {
+    origin: allowedOrigins
+};
 // Middleware
+app.use((0, cors_1.default)(options));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 const ccp = (0, AppUtil_1.buildCCPOrg1)();
@@ -89,7 +97,7 @@ app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, functi
         const adminWallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         // Check user Identity exist first and register
         yield (0, CAUtil_1.registerAndEnrollUser)(caClient, adminWallet, userWallet, orgName, uuid, 'org1.department1');
-        res.status(200).send(`${userId} is associated with digital ID: ${uuid}`);
+        res.status(200).json({ did: uuid, userId: userId });
     }
     catch (error) {
         console.log(error);
@@ -125,7 +133,7 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
         // 	res.status(409).send(`Conflict error: record already exist with ${DId}`)
         // }
         yield contract.submitTransaction('CreateCertification', JSON.stringify(data));
-        res.status(200).send('Certification created successfully');
+        res.status(200).json(data);
     }
     catch (error) {
         console.log(error);

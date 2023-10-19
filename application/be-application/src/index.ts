@@ -5,6 +5,7 @@ import { buildCCPOrg1, buildWallet, checkIdentity, prettyJSONString, readWallet 
 import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
 import { CertificationRequest } from './utils/Models';
 import shortUUID from 'short-uuid';
+import cors from 'cors'
 
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
@@ -15,8 +16,16 @@ const userWalletPath = path.join(__dirname, 'userWallet');
 
 const app: Express = express();
 const port = 3000;
+// Add a list of allowed origins.
+// If you have more origins you would like to add, you can add them to the array below.
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+
+const options: cors.CorsOptions = {
+  origin: allowedOrigins
+};
 
 // Middleware
+app.use(cors(options))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,7 +68,7 @@ app.post('/registerUser', async(req: Request, res: Response) => {
 
 		// Check user Identity exist first and register
 		await registerAndEnrollUser(caClient, adminWallet, userWallet, orgName, uuid, 'org1.department1');
-		res.status(200).send(`${userId} is associated with digital ID: ${uuid}`);
+		res.status(200).json({did: uuid, userId: userId});
 	} catch (error) {
 		console.log(error);
 		res.status(400).send("Error: Wallet creation failed");
@@ -109,7 +118,7 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 		// }
 
 		await contract.submitTransaction('CreateCertification', JSON.stringify(data));
-		res.status(200).send('Certification created successfully');
+		res.status(200).json(data);
 	} catch (error) {
 		console.log(error);
 		res.status(400).send("Error: Fail to persist Certification");
