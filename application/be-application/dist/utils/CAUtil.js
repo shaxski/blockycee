@@ -34,16 +34,16 @@ const buildCAClient = (ccp, caHostName) => {
     return caClient;
 };
 exports.buildCAClient = buildCAClient;
-const enrollAdmin = (caClient, wallet, orgMspId) => __awaiter(void 0, void 0, void 0, function* () {
+const enrollAdmin = (caClient, wallet, orgMspId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check to see if we've already enrolled the admin user.
-        const identity = yield wallet.get(adminUserId);
+        const identity = yield wallet.get(userId);
         if (identity) {
             console.log('An identity for the admin user already exists in the wallet');
             return;
         }
         // Enroll the admin user, and import the new identity into the wallet.
-        const enrollment = yield caClient.enroll({ enrollmentID: adminUserId, enrollmentSecret: adminUserPasswd });
+        const enrollment = yield caClient.enroll({ enrollmentID: userId, enrollmentSecret: adminUserPasswd });
         const x509Identity = {
             credentials: {
                 certificate: enrollment.certificate,
@@ -52,7 +52,7 @@ const enrollAdmin = (caClient, wallet, orgMspId) => __awaiter(void 0, void 0, vo
             mspId: orgMspId,
             type: 'X.509',
         };
-        yield wallet.put(adminUserId, x509Identity);
+        yield wallet.put(userId, x509Identity);
         console.log('Successfully enrolled admin user and imported it into the wallet');
     }
     catch (error) {

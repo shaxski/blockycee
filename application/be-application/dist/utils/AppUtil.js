@@ -37,10 +37,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prettyJSONString = exports.readWallet = exports.buildWallet = exports.buildCCPOrg2 = exports.buildCCPOrg1 = void 0;
+exports.checkIdentity = exports.prettyJSONString = exports.readWallet = exports.buildWallet = exports.buildCCPOrg2 = exports.buildCCPOrg1 = void 0;
 const fabric_network_1 = require("fabric-network");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const channelName = process.env.CHANNEL_NAME || 'mychannel';
+const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
+const adminWalletPath = path.join(__dirname, 'adminwallet');
+const userWalletPath = path.join(__dirname, 'userWallet');
+const gateway = new fabric_network_1.Gateway();
 const buildCCPOrg1 = () => {
     // load the common connection configuration file
     const ccpPath = path.resolve(__dirname, '..', '..', '..', '..', 'basic-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
@@ -69,6 +74,15 @@ const buildCCPOrg2 = () => {
     return ccp;
 };
 exports.buildCCPOrg2 = buildCCPOrg2;
+const checkIdentity = (walletPath, uuid) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check to see if we've already enrolled the user
+    const userIdentity = yield readWallet(walletPath).then(wallet => wallet.get(uuid));
+    if (!userIdentity) {
+        return false;
+    }
+    return true;
+});
+exports.checkIdentity = checkIdentity;
 const buildWallet = (walletPath) => __awaiter(void 0, void 0, void 0, function* () {
     // Create a new  wallet : Note that wallet is for managing identities.
     let wallet;
