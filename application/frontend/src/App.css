@@ -1,3 +1,8 @@
+header {
+  padding-top: 1rem;
+  text-align: center;
+  font-family: 'Lexend Deca', sans-serif; 
+}
 .App {
   text-align: center;
   font-family: 'Lexend Deca', sans-serif; 
@@ -13,7 +18,6 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
-
 .App-body {
   border-radius: 8px;
   z-index:-1; 
@@ -41,6 +45,10 @@
   }
 }
 
+.App-textField {
+  height: 1.5rem;
+  font-size: x-large;
+}
 .App-modal { 
   background-color: aquamarine;
   z-index:1; 
@@ -52,20 +60,18 @@
 
 .Message-container {
   border-radius: 8px;
-  background: orange;
+  background: rgb(246, 69, 10);
   align-items: center;
   justify-content: center;
   text-align: center;
   vertical-align: middle;
 }
 .Message-text {
+  padding: 1%;
   margin-left: auto;
   margin-right: auto;
   font-size: large;
-  /* text-align: center;
-  align-items: center;
-  justify-content: center; */
-  vertical-align: middle;
+  font-weight: 500;
   color: white;
 }
 
@@ -98,7 +104,7 @@
   background-color: #d74423; 
 }
 .Submit-button {
-  margin-right: 3%;
+  margin-right: 7%;
   color: white;
   background-color: transparent; 
   /* background-color: #29299e;  */
@@ -119,13 +125,14 @@
 
 .App-footer {
   height: 10vh;
-  background-color: #162c7e;
+  /* background-color: #162c7e; */
   text-align: center;
-  font-size: 1.2rem;
+  font-size: large;
   justify-content: center;
   padding-top: 3vh;
-  color: white;
+  font-weight: 500;
+  /* color: white; */
 }
 .text-white {
-  color: white
+  color: black
 }

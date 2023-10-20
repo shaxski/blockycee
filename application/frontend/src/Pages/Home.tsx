@@ -67,20 +67,20 @@ export default function Home() {
 				<form method="post" onSubmit={handleSubmit}>
 					<label>
 						<h5>
-							User Id: <input name="userId" defaultValue="" />
+							User Id: <input className='App-textField' name="userId" defaultValue="" />
 						</h5>
 					</label>
 					<hr />
+					{error && (
+					<div className='Message-container '>
+						<p className='Message-text'> Error occurred</p>
+					</div>
+					)}
 					<button className='App-button Submit-button' type="submit">Register</button>
 					<button className='App-button QR-button' onClick={navigateToQRCode}>QR Code</button>
 					{/* <button onClick={showModal}>Open Modal</button> */}
 				</form>
 			</body>
-			{error && (
-				<div className='Message-container '>
-					<p className='Message-text'> Error occurred</p>
-				</div>
-			)}
 		</div>
   );
 }
