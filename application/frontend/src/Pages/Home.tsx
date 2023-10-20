@@ -3,12 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import RegisterCertification from './RegisterCertification';
 import { postData } from './api';
 
+export type CertificateType = {
+	DId: string;
+	CertifierId: string;
+	IssueDate: string;
+	CertificateType: string;
+	ExpiryDate: string;
+	PublicKey: string;
+	CertificationId: string;
+}
 
 export default function Home() {
 	const [uuid, setUuid] = useState<string>('');
 	const [errorMessage, setErrorMessage] = useState<string>('')
 	const [userId, setUserId] = useState<string>('')
-	const [openModal, setOpenModal] = useState<boolean>(true)
+	const [openModal, setOpenModal] = useState<boolean>(false)
+	const [certification, setCertification] = useState<CertificateType>({
+		"DId": '',
+    "CertifierId": '',
+    "IssueDate": "",
+    "CertificateType": "",
+    "ExpiryDate": "",
+    "PublicKey": "",
+    "CertificationId":"",
+	})
   const navigate = useNavigate();
 
 	const showModal = () => {
@@ -27,7 +45,8 @@ export default function Home() {
 	const handleSubmit = async(e: { preventDefault: () => void }) => {
     // Prevent the browser from reloading the page
     e.preventDefault();
-
+		console.log('certification',certification);
+		
 		setErrorMessage('')	
 		
 		if (userId.length < 4) {
@@ -46,11 +65,11 @@ export default function Home() {
 	
   return (
 		<div className="App">
-			{openModal && <RegisterCertification setOpenModal={setOpenModal} did={uuid}/>}
+			{openModal && <RegisterCertification setOpenModal={setOpenModal} did={uuid} setCertification={setCertification}/>}
 			<header>
 				<h1>Welcome to Blockchain Beauty Organization</h1>
 			</header>
-			<body className="App-body">
+			<div className="App-body">
 				<div>
 					<label>
 						<h5>
@@ -66,8 +85,8 @@ export default function Home() {
 					<button className='App-button Submit-button' onClick={handleSubmit}>Register</button>
 					<button className='App-button QR-button' onClick={navigateToQRCode}>QR Code</button>
 				</div>
-					{/* <button onClick={showModal}>Open Modal</button> */}
-			</body>
+			</div>
+			<button onClick={showModal}>Open Modal</button>
 		</div>
   );
 }

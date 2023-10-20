@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
+import { CertificateType } from './Home';
 
 type RegisterCertificationProps = { 
 	did: string; 
-	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>; 
+	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+	setCertification: React.Dispatch<React.SetStateAction<CertificateType>>
 } 
 
 export default function RegisterCertification(props:RegisterCertificationProps) {
-	const {did, setOpenModal} = props;
+	const {did, setOpenModal, setCertification} = props;
 	console.log(did);
 	
 	const closeModal = () => setOpenModal(false);
@@ -31,13 +33,15 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 		
 		const certifcationData = {
 			DId: contract.DId,
-			CertifierId: formData.get('certificationId'),
-			CertificateType: formData.get('certificationType'),
-			IssueDate: formData.get('issueDate'),
-			ExpiryDate: formData.get('expiryDate')
+			CertifierId: formData.get('certificationId')!.toString(),
+			CertificationId: formData.get('certificationId')!.toString(),
+			CertificateType: formData.get('certificationType')!.toString(),
+			IssueDate: formData.get('issueDate')!.toString(),
+			ExpiryDate: formData.get('expiryDate')!.toString(),
+			PublicKey: 'adsfsdfsadf'
 		}
 		console.log(certifcationData);
-		
+		setCertification(certifcationData)
   }
 
 	return (
@@ -50,8 +54,12 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 					<input className='Modal-textField' type='text' name="did" defaultValue={contract.DId} disabled/>
 				</label>
 				<label className='Modal-label' >
+					<h5 className='Modal-text'>Certifier Id:</h5>
+					<input className='Modal-textField' name="certifierId" type='text' defaultValue={contract.CertifierId} required/>
+				</label>
+				<label className='Modal-label' >
 					<h5 className='Modal-text'>Certification Id:</h5>
-					<input className='Modal-textField' name="certificationId" type='text' defaultValue={contract.CertifierId} required/>
+					<input className='Modal-textField' name="certificationId" type='text' defaultValue={contract.CertificationId} required/>
 				</label>
 				<label className='Modal-label'>
 					<h5 className='Modal-text'>Certification Type:</h5>
