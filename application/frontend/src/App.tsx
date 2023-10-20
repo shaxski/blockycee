@@ -14,10 +14,6 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
-  // return (
-    
-  //   <QR />
-  // );
 }
 
 export default App;

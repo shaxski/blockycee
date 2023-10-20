@@ -36,9 +36,8 @@ export default function Home() {
 
 	const registerUser = (userId:string) => postData("http://localhost:3000/registerUser",{ orgName: "Org1MSP", userId: userId})
 	.then((data) => {		
-		setError(false)	
 		setUuid(data.did)
-		setOpenModal(true)
+		showModal()
 	}).catch((error) => {
 		console.log(error);
 		setError(true)
@@ -51,7 +50,8 @@ export default function Home() {
     // Read the form data
     const form = e.target;				
     const formData = new FormData(form);
-
+		
+		setError(false)	
 		registerUser(formData.get('userId')?.toString() ?? 'User')
 		
   }
