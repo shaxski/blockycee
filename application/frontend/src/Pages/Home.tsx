@@ -14,7 +14,6 @@ export type CertificateType = {
 }
 
 export default function Home() {
-	const [uuid, setUuid] = useState<string>('');
 	const [errorMessage, setErrorMessage] = useState<string>('')
 	const [userId, setUserId] = useState<string>('')
 	const [openModal, setOpenModal] = useState<boolean>(false)
@@ -35,7 +34,8 @@ export default function Home() {
 
 	const registerUser = (userId:string) => postData("http://localhost:3000/registerUser",{ orgName: "Org1MSP", userId: userId})
 	.then((data) => {		
-		setUuid(data.did)
+		setCertification({...certification, DId: data.did})
+
 		showModal()
 	}).catch((error) => {
 		console.log(error);
@@ -45,8 +45,19 @@ export default function Home() {
 	const handleSubmit = async(e: { preventDefault: () => void }) => {
     // Prevent the browser from reloading the page
     e.preventDefault();
-		console.log('certification',certification);
-		
+
+		//TODO: sample data. !This need to be removed
+		const contract = {
+			"DId": "whsonvm5XMTmiCq4RzCyzi",
+			"CertifierId": "Organization AUT",
+			"IssueDate": "2023-10-03T12:00:00.000Z",
+			"CertificateType": "Type A",
+			"ExpiryDate": "2025-10-03T12:00:00.000Z",
+			"PublicKey": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF5SFd1RmZHMEt0T3BtZnkxMnVWbQo3bjdYMG1DVlFyY0EzYzU4SnUrZ1p1bmdpa1dOd0lZZkNNQUpMMjF2bHJRV3dXMUVBcnU5QlZ6Sy9aWUkxTUNpCm1FdHZTZnNUZ0dNcTN3MzZOVkNDR204RWY4NTlKY1JJTEU2QmIzY0w2NVc0MW5jNG5YOTBwd24yL1VyNGlCMzAKQW5BNDNuTHJtRkhBYWRja2E5UUxEK2REZ3ZWUEMvN25qaTA5MEI0NFVDaklrVWJIS25FVTF5TitzcVVSZFBQNApzcTh6TFhqb2VLaENRb0ttR1FhSktRdU1ZUEJxMUFVOTNqRHhMbHFHS29MMloxU21lMC9tRGdNcUZ6MThQOVJlCnBXbXRNdDRiNDUxWXNSQksrR3pidFJHN0dHcHpZMEdTTmxwRHdIRm5Ec0VVNUd3WlVBelo2eFQ5dlRsVlhuRmsKblFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==",
+			"CertificationId": "ProCertId-Kai1"
+		};
+		setCertification(contract)
+				
 		setErrorMessage('')	
 		
 		if (userId.length < 4) {
@@ -54,7 +65,7 @@ export default function Home() {
 			return;
 		}
 		await registerUser(userId)
-		
+
   }
 	const handleChange= (e: { preventDefault: () => void; target: { value: React.SetStateAction<string>; }; })=>{
 		e.preventDefault();
@@ -65,7 +76,7 @@ export default function Home() {
 	
   return (
 		<div className="App">
-			{openModal && <RegisterCertification setOpenModal={setOpenModal} did={uuid} setCertification={setCertification}/>}
+			{openModal && <RegisterCertification setOpenModal={setOpenModal} dId={certification.DId} setCertification={setCertification}/>}
 			<header>
 				<h1>Welcome to Blockchain Beauty Organization</h1>
 			</header>
