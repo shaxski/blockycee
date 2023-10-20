@@ -49,14 +49,6 @@ header {
   height: 1.5rem;
   font-size: x-large;
 }
-.App-modal { 
-  background-color: aquamarine;
-  z-index:1; 
-  position: absolute;
-  width: 90%;
-  height: 90%;
-  left: 5%;
-}
 
 .Message-container {
   border-radius: 8px;
@@ -104,7 +96,6 @@ header {
   background-color: #d74423; 
 }
 .Submit-button {
-  margin-right: 7%;
   color: white;
   background-color: transparent; 
   /* background-color: #29299e;  */
@@ -113,6 +104,7 @@ header {
   background-color: #29299e;
 }
 .QR-button {
+  margin-left: 7%;
   color: white;
   background-color: transparent; 
   /* background-color: #4CAF50;  */
@@ -120,8 +112,6 @@ header {
 .QR-button:hover {
   background-color: #4CAF50; 
 }
-
-
 
 .App-footer {
   height: 10vh;
@@ -135,4 +125,57 @@ header {
 }
 .text-white {
   color: black
+}
+.App-modal { 
+  background-color: rgb(22, 7, 117);
+  z-index:1; 
+  position: absolute;
+  top: 4%;
+  width: 80%;
+  height: 92%;
+  left: 10%;
+  border-radius: 10px;
+  border: none;
+}
+.Modal-label {
+  display: grid;
+  grid-template-columns: 30% 50%;
+  grid-template-rows: auto;
+  grid-template-areas: 
+    "text input";
+  align-items: center;
+  justify-content: center;
+}
+.Modal-text {
+  grid-area: text;
+  font-size: large;
+  color: white;
+}
+
+.Modal-textField {
+  grid-area: input;
+  margin: 1rem;
+  font-size: large;
+  padding-left: 2%;
+}
+.Modal-dateField {
+  grid-area: input;
+  margin: 1rem;
+  font-size: large;
+  padding-left: 2%;
+}
+.Modal-radio {
+  grid-area: input;
+  margin: 1rem;
+  margin-top: 2rem;
+  font-size: large;
+  color: white;
+}
+.Certification-form {
+  color: white;
+  margin-bottom: 5%;
+}
+
+.App-border {
+  margin-bottom: 5%;
 }

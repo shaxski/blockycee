@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import RegisterCertification from './RegisterCertification';
@@ -9,7 +8,7 @@ export default function Home() {
 	const [uuid, setUuid] = useState<string>('');
 	const [errorMessage, setErrorMessage] = useState<string>('')
 	const [userId, setUserId] = useState<string>('')
-	const [openModal, setOpenModal] = useState<boolean>(false)
+	const [openModal, setOpenModal] = useState<boolean>(true)
   const navigate = useNavigate();
 
 	const showModal = () => {
@@ -25,18 +24,17 @@ export default function Home() {
 		setErrorMessage('Fail to register user')
 	});
 
-	async function handleSubmit(e: { preventDefault: () => void; target: any; }) {
+	const handleSubmit = async(e: { preventDefault: () => void }) => {
     // Prevent the browser from reloading the page
     e.preventDefault();
 
 		setErrorMessage('')	
-		console.log(userId.length);
 		
 		if (userId.length < 4) {
 			setErrorMessage('Invalid User Id')
 			return;
 		}
-		registerUser(userId)
+		await registerUser(userId)
 		
   }
 	const handleChange= (e: { preventDefault: () => void; target: { value: React.SetStateAction<string>; }; })=>{
