@@ -50,7 +50,7 @@ export default function Home() {
     // Read the form data
     const form = e.target;				
     const formData = new FormData(form);
-		
+
 		setError(false)	
 		registerUser(formData.get('userId')?.toString() ?? 'User')
 		
@@ -59,26 +59,28 @@ export default function Home() {
 
   return (
 		<div className="App">
-			{error && (
-				<p className='Error-Message'>Error occurred</p>
-			)}
 			{openModal && <RegisterCertification setOpenModal={setOpenModal} did={uuid}/>}
 			<header>
 				<h1>Welcome to Blockchain Beauty Organization</h1>
 			</header>
-			<body className="App-header">
+			<body className="App-body">
 				<form method="post" onSubmit={handleSubmit}>
 					<label>
 						<h5>
-							User Id: <input name="userId" defaultValue="Register with user Id" />
+							User Id: <input name="userId" defaultValue="" />
 						</h5>
 					</label>
 					<hr />
-					<button type="submit">Register</button>
-					<button onClick={navigateToQRCode}>Open QRCode</button>
-					<button onClick={showModal}>Open Modal</button>
+					<button className='App-button Submit-button' type="submit">Register</button>
+					<button className='App-button QR-button' onClick={navigateToQRCode}>QR Code</button>
+					{/* <button onClick={showModal}>Open Modal</button> */}
 				</form>
 			</body>
+			{error && (
+				<div className='Message-container '>
+					<p className='Message-text'> Error occurred</p>
+				</div>
+			)}
 		</div>
   );
 }

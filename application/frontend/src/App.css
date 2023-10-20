@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: 'Lexend Deca', sans-serif; 
 }
 
 .App-logo {
@@ -13,7 +14,8 @@
   }
 }
 
-.App-header {
+.App-body {
+  border-radius: 8px;
   z-index:-1; 
   background-color: #282c34;
   min-height: 80vh;
@@ -23,6 +25,7 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  font-size: xx-large;
 }
 
 .App-link {
@@ -45,6 +48,84 @@
   width: 90%;
   height: 90%;
   left: 5%;
+}
+
+.Message-container {
+  border-radius: 8px;
+  background: orange;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+}
+.Message-text {
+  margin-left: auto;
+  margin-right: auto;
+  font-size: large;
+  /* text-align: center;
+  align-items: center;
+  justify-content: center; */
+  vertical-align: middle;
+  color: white;
+}
+
+.App-button {
+  border-radius: 50px;
+  border: none;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1.25rem;
+  border-color: white;
+  border-style: solid;
+}
+.App-button:hover {background-color: #3e8e41}
+
+.App-button:active {
+  /* background-color: #3e8e41; */
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.Back-button {
+  color: white;
+  background-color: transparent; 
+  /* background-color: #d74423;  */
+  margin-top: 3%;
+}
+.Back-button:hover {
+  background-color: #d74423; 
+}
+.Submit-button {
+  margin-right: 3%;
+  color: white;
+  background-color: transparent; 
+  /* background-color: #29299e;  */
+}
+.Submit-button:hover {
+  background-color: #29299e;
+}
+.QR-button {
+  color: white;
+  background-color: transparent; 
+  /* background-color: #4CAF50;  */
+}
+.QR-button:hover {
+  background-color: #4CAF50; 
+}
 
 
+
+.App-footer {
+  height: 10vh;
+  background-color: #162c7e;
+  text-align: center;
+  font-size: 1.2rem;
+  justify-content: center;
+  padding-top: 3vh;
+  color: white;
+}
+.text-white {
+  color: white
 }

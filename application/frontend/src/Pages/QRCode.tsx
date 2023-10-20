@@ -15,11 +15,11 @@ export default function QrCode() {
 	return (
 		<div className="App">
 			<header>
-				<button onClick={home}>back</button>
 				<h1>QR Code</h1>
 			</header>
-			<body className="App-header">
+			<body className="App-body">
 				<QRCodeSVG value={qrText} size={400}/>
+				<button className={"App-button Back-button"} onClick={home}>Back</button>
 			</body>
 		</div>
 	)
