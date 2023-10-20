@@ -14,8 +14,9 @@
 }
 
 .App-header {
+  z-index:-1; 
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,4 +36,15 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.App-modal { 
+  background-color: aquamarine;
+  z-index:1; 
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  left: 5%;
+
+
 }
