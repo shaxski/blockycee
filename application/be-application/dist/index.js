@@ -54,7 +54,6 @@ const CAUtil_1 = require("./utils/CAUtil");
 const short_uuid_1 = __importDefault(require("short-uuid"));
 const cors_1 = __importDefault(require("cors"));
 const crypto_1 = __importDefault(require("crypto"));
-const fs_1 = __importDefault(require("fs"));
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 const adminWalletPath = path.join(__dirname, 'adminwallet');
@@ -128,12 +127,6 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
         const network = yield gateway.getNetwork(channelName);
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
-        yield contract.evaluateTransaction('GetCertificationByDId', DId).catch(error => {
-            console.log('isRecordAlreadyExist asdfasdf:', error);
-        });
-        // if (isRecordAlreadyExist) {
-        // 	res.status(409).send(`Conflict error: record already exist with ${DId}`)
-        // }
         const { privateKey, publicKey } = crypto_1.default.generateKeyPairSync('rsa', {
             modulusLength: 2048,
             publicKeyEncoding: {
@@ -145,8 +138,6 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
                 format: 'pem'
             }
         });
-        fs_1.default.appendFileSync('./privateKey.pem', privateKey);
-        fs_1.default.appendFileSync('./publicKey.pem', publicKey);
         const data = Object.assign(Object.assign({}, req.body), { PublicKey: publicKey });
         yield contract.submitTransaction('CreateCertification', JSON.stringify(data));
         res.status(200).json({

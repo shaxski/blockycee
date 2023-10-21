@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { CertificateType } from './Home';
+import { postData } from './api';
 
 type RegisterCertificationProps = { 
 	dId: string; 
@@ -12,6 +13,23 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 	const {dId, setOpenModal, setCertification} = props;
 	
 	const closeModal = () => setOpenModal(false);
+
+
+	const registerCertification = (certifcationData: CertificateType) => postData("http://localhost:3000/recordCertification",certifcationData)
+	.then((data) => {		
+		setCertification(certifcationData)
+
+		const blob = new Blob([data.privateKey], { type: "text/plain" });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.download = `${dId}.pem`;
+		link.href = url;
+		link.click();
+
+		closeModal();
+	}).catch((error) => {
+		console.log(error);
+	});
 
 
 	const handleCertificationSubmit = (e: { preventDefault: () => void; target: any; }) => {
@@ -30,8 +48,8 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 			IssueDate: formData.get('issueDate')!.toString(),
 			ExpiryDate: formData.get('expiryDate')!.toString(),
 		}
+		registerCertification(certifcationData)
 		console.log(certifcationData);
-		setCertification(certifcationData)
   }
 
 	return (
