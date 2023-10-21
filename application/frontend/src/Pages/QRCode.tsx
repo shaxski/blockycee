@@ -1,35 +1,21 @@
 import React from 'react'
 import { QRCodeSVG } from 'qrcode.react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { JSEncrypt } from "jsencrypt";
-
-const encrypt = new JSEncrypt();
 
 export default function QrCode() {
 	const { state } = useLocation();
+
+	console.log('state QR', state.encryptData);
+	console.log(state.certification.DId);
 	
-
-	const tryKey = async() => {
-
-		console.log('asdf',state);
-
-		encrypt.setPrivateKey(state.privateKey)
-		const encrypted = encrypt.encrypt(JSON.stringify(state.certification));
-		console.log(encrypted);
-		
-
-
-	}
-	tryKey()
-	// console.log('state QR',state);
 	const navigate = useNavigate();
 	// This need to pass as props
 	const qrText = JSON.stringify({
-		"CertificationId": "ProCertId-Kai1",
-		"SignedData": "Sq9tIVqs65kl8ywFL9VUX54j+DO3JCspnot/wgpUpiNLZyy+q6nazH2eD03b4sB7fMV8UcYVAavvL0I4Qib3+7Cl72J0M89wjQMtlNo4Ylt7kcgfD1Nm3sdMsvABmRy4SwgwMOKo8pFYMM1gbCOtIhn2JANYTmO1UQNCG4R79UVpRG1lEYHksnXWEYNXK9Vz5jSVOjCq018w31rHBscJTvnSCL5toMkttp+qg601jbD4OnEIntW6S4A++sFjEVls+ShJfms40XT1KgnnWpZg7YJ+jQUXAmfsHzeR4YASLf+Ym6g98boE6qGuy//g9EK75rXiHEZMPsNIQZDtCXxeSw=="
+		"DId": state.certification.DId,
+		"SignedData": state.encryptData
 	});
 
-	const home = () => navigate('/', {state:{...state}});
+	const home = () => navigate('/', {state:{...state.certification}});
 
 	return (
 		<div className="App">

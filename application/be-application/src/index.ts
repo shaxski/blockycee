@@ -7,6 +7,7 @@ import { CertificationRequest } from './utils/Models';
 import shortUUID from 'short-uuid';
 import cors from 'cors';
 import crypto from 'crypto';
+import fs from 'fs';
 
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
@@ -125,7 +126,7 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 			PublicKey: publicKey
 		};
 
-
+		fs.appendFileSync(`./${DId}.pem`,privateKey)
 		await contract.submitTransaction('CreateCertification', JSON.stringify(data));
 		res.status(200).json({
 			privateKey: privateKey
@@ -136,6 +137,24 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 	}
 
 });
+
+app.post('/generateSignedData', async(req: Request, res: Response) => {
+	const { DId, SignedData} = req.body;
+	const privateKey = fs.readFileSync(`./${DId}.pem`, { encoding: "utf8" })
+	const str = JSON.stringify(SignedData)
+	const buff = Buffer.from(str, "utf-8");
+	const encryptData=  crypto.privateEncrypt(privateKey, buff);
+	try{
+		res.status(200).json({
+			encryptData: encryptData.toString('base64')
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(400).send({
+			encryptData: ''
+		});
+	}
+})
 
 app.get('/certification/:id', async(req: Request, res: Response) => {
 

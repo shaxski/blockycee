@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom';
+import {  useLocation, useNavigate} from 'react-router-dom';
 import RegisterCertification from './RegisterCertification';
 import { postData } from './api';
 
@@ -13,12 +13,12 @@ export type CertificateType = {
 }
 
 const initCertification = {
-	"DId": 'asdf',
-	"CertifierId": 'asdf',
-	"IssueDate": "asdf",
-	"CertificateType": "asdf",
-	"ExpiryDate": "asdf",
-	"CertificationId": "asdf",
+	"DId": '',
+	"CertifierId": '',
+	"IssueDate": "",
+	"CertificateType": "",
+	"ExpiryDate": "",
+	"CertificationId": "",
 }
 
 export default function Home() {
@@ -33,9 +33,12 @@ export default function Home() {
 	const navigate = useNavigate();
 
 	useEffect(() => {		
+		console.log(privateKey);
+
 		if (state) {
-			setCertification(state.certification);
-			setPrivateKey(state.privateKey)
+			
+			setCertification(state);
+			// setPrivateKey(state.privateKey)
 		}
 		return () => {
 			setCertification(initCertification)
@@ -78,13 +81,19 @@ export default function Home() {
 		setUserId(e.target.value)
 	};
 	
-	const navigateToQRCode = () => {
-		const qrCodeData = {
-			certification: certification,
-			privateKey:privateKey
-		}
+	const navigateToQRCode = async() => {
+		
+		if (certification.DId || certification.DId.length) {
+			const value = await postData("http://localhost:3000/generateSignedData",{ DId: certification.DId, SignedData: certification})
 
-		navigate('/QRCode', {state: qrCodeData})
+			const qrCodeData = {
+				encryptData:value.encryptData,
+				certification: certification
+			};
+			
+			navigate('/QRCode', {state: qrCodeData});
+		}
+		setErrorMessage('Missing Digital Id. Please Create one');
 	};
 	
   return (
@@ -110,7 +119,6 @@ export default function Home() {
 					<button className='App-button QR-button' onClick={navigateToQRCode}>QR Code</button>
 				</div>
 			</div>
-			<button onClick={showModal}>Open Modal</button>
 		</div>
   );
 }

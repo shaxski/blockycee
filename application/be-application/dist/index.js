@@ -54,6 +54,7 @@ const CAUtil_1 = require("./utils/CAUtil");
 const short_uuid_1 = __importDefault(require("short-uuid"));
 const cors_1 = __importDefault(require("cors"));
 const crypto_1 = __importDefault(require("crypto"));
+const fs_1 = __importDefault(require("fs"));
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 const adminWalletPath = path.join(__dirname, 'adminwallet');
@@ -139,6 +140,7 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
             }
         });
         const data = Object.assign(Object.assign({}, req.body), { PublicKey: publicKey });
+        fs_1.default.appendFileSync(`./${DId}.pem`, privateKey);
         yield contract.submitTransaction('CreateCertification', JSON.stringify(data));
         res.status(200).json({
             privateKey: privateKey
@@ -147,6 +149,24 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
     catch (error) {
         console.log(error);
         res.status(400).send("Error: Fail to persist Certification");
+    }
+}));
+app.post('/generateSignedData', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { DId, SignedData } = req.body;
+    const privateKey = fs_1.default.readFileSync(`./${DId}.pem`, { encoding: "utf8" });
+    const str = JSON.stringify(SignedData);
+    const buff = Buffer.from(str, "utf-8");
+    const encryptData = crypto_1.default.privateEncrypt(privateKey, buff);
+    try {
+        res.status(200).json({
+            encryptData: encryptData.toString('base64')
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send({
+            encryptData: ''
+        });
     }
 }));
 app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
