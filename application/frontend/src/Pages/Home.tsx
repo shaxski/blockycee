@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom';
 import RegisterCertification from './RegisterCertification';
 import { postData } from './api';
 
@@ -13,22 +13,33 @@ export type CertificateType = {
 }
 
 export default function Home() {
-	const [errorMessage, setErrorMessage] = useState<string>('')
-	const [userId, setUserId] = useState<string>('')
-	const [openModal, setOpenModal] = useState<boolean>(false)
-	const [certification, setCertification] = useState<CertificateType>({
+	const initCertification = {
 		"DId": '',
     "CertifierId": '',
     "IssueDate": "",
     "CertificateType": "",
     "ExpiryDate": "",
     "CertificationId":"",
-	})
-  const navigate = useNavigate();
+	}
+	const [errorMessage, setErrorMessage] = useState<string>('');
+	const [userId, setUserId] = useState<string>('');
+	const [openModal, setOpenModal] = useState<boolean>(false);
+	const [certification, setCertification] = useState<CertificateType>(initCertification);
+
+	const { state } = useLocation();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		setCertification(state);
+		return () => {
+			setCertification(initCertification)
+		}
+	}, [state]);
+	
 
 	const showModal = () => {
 		setOpenModal(true)
-	}
+	};
 
 	const registerUser = (userId:string) => postData("http://localhost:3000/registerUser",{ orgName: "Org1MSP", userId: userId})
 	.then((data) => {		
@@ -52,13 +63,15 @@ export default function Home() {
 		}
 		await registerUser(userId)
 
-  }
+  };
 	const handleChange= (e: { preventDefault: () => void; target: { value: React.SetStateAction<string>; }; })=>{
 		e.preventDefault();
 		
 		setUserId(e.target.value)
-	}
-	const navigateToQRCode = () => navigate('/QRCode')
+	};
+	console.log('cert',certification);
+	
+	const navigateToQRCode = () => navigate('/QRCode', {state:certification});
 	
   return (
 		<div className="App">
