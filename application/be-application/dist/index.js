@@ -53,6 +53,8 @@ const AppUtil_1 = require("./utils/AppUtil");
 const CAUtil_1 = require("./utils/CAUtil");
 const short_uuid_1 = __importDefault(require("short-uuid"));
 const cors_1 = __importDefault(require("cors"));
+const crypto_1 = __importDefault(require("crypto"));
+const fs_1 = __importDefault(require("fs"));
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
 const adminWalletPath = path.join(__dirname, 'adminwallet');
@@ -106,7 +108,6 @@ app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, functi
 }));
 app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const _a = req.body, { DId, CertifierId, CertificationId, IssueDate, CertificateType, ExpiryDate, PublicKey } = _a, params = __rest(_a, ["DId", "CertifierId", "CertificationId", "IssueDate", "CertificateType", "ExpiryDate", "PublicKey"]);
-    const data = Object.assign({}, req.body);
     const isUserExist = (0, AppUtil_1.checkIdentity)(userWalletPath, DId);
     if (!isUserExist) {
         res.status(404).send("Digital Id not found");
@@ -127,13 +128,30 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
         const network = yield gateway.getNetwork(channelName);
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
-        // const isRecordAlreadyExist = await contract.evaluateTransaction('GetCertificationByDId', DId);
-        // console.log('asdfasdf',isRecordAlreadyExist);
+        yield contract.evaluateTransaction('GetCertificationByDId', DId).catch(error => {
+            console.log('isRecordAlreadyExist asdfasdf:', error);
+        });
         // if (isRecordAlreadyExist) {
         // 	res.status(409).send(`Conflict error: record already exist with ${DId}`)
         // }
+        const { privateKey, publicKey } = crypto_1.default.generateKeyPairSync('rsa', {
+            modulusLength: 2048,
+            publicKeyEncoding: {
+                type: 'spki',
+                format: 'pem'
+            },
+            privateKeyEncoding: {
+                type: 'pkcs8',
+                format: 'pem'
+            }
+        });
+        fs_1.default.appendFileSync('./privateKey.pem', privateKey);
+        fs_1.default.appendFileSync('./publicKey.pem', publicKey);
+        const data = Object.assign(Object.assign({}, req.body), { PublicKey: publicKey });
         yield contract.submitTransaction('CreateCertification', JSON.stringify(data));
-        res.status(200).json(data);
+        res.status(200).json({
+            privateKey: privateKey
+        });
     }
     catch (error) {
         console.log(error);

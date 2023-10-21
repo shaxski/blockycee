@@ -5,7 +5,8 @@ import { buildCCPOrg1, buildWallet, checkIdentity, prettyJSONString, readWallet 
 import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
 import { CertificationRequest } from './utils/Models';
 import shortUUID from 'short-uuid';
-import cors from 'cors'
+import cors from 'cors';
+import crypto from 'crypto';
 
 const channelName = process.env.CHANNEL_NAME || 'mychannel';
 const chaincodeName = process.env.CHAINCODE_NAME || 'basic';
@@ -79,11 +80,9 @@ app.post('/registerUser', async(req: Request, res: Response) => {
 app.post('/recordCertification', async(req: Request, res: Response) => {
 	const { DId,CertifierId,CertificationId,IssueDate,CertificateType,ExpiryDate,PublicKey, ...params }:CertificationRequest = req.body;
 
-	const data = {
-		...req.body
-	};
 
 	const isUserExist = checkIdentity(userWalletPath, DId)
+	
 	if (!isUserExist) {
 		res.status(404).send("Digital Id not found");
 	}
@@ -109,16 +108,28 @@ app.post('/recordCertification', async(req: Request, res: Response) => {
 		// Get the contract from the network.
 		const contract = network.getContract(chaincodeName);
 
-		// const isRecordAlreadyExist = await contract.evaluateTransaction('GetCertificationByDId', DId);
+		const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
+			modulusLength: 2048,
+			publicKeyEncoding: {
+				type: 'spki',
+				format: 'pem'
+			},
+			privateKeyEncoding: {
+				type: 'pkcs8',
+				format: 'pem'
+			}
+		});
 
-		// console.log('asdfasdf',isRecordAlreadyExist);
-		
-		// if (isRecordAlreadyExist) {
-		// 	res.status(409).send(`Conflict error: record already exist with ${DId}`)
-		// }
+		const data = {
+			...req.body,
+			PublicKey: publicKey
+		};
+
 
 		await contract.submitTransaction('CreateCertification', JSON.stringify(data));
-		res.status(200).json(data);
+		res.status(200).json({
+			privateKey: privateKey
+		});
 	} catch (error) {
 		console.log(error);
 		res.status(400).send("Error: Fail to persist Certification");
@@ -180,7 +191,6 @@ app.post('/verifyCertification', async(req: Request, res: Response) => {
 		...req.body
 	};
 	
-
 	try {
 		let wallet = await readWallet(adminWalletPath);
 		const gatewayOpts: GatewayOptions = {
