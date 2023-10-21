@@ -59,6 +59,7 @@ const checkIdentity = async (walletPath: string, uuid: string): Promise<boolean>
     return true
 }
 
+
 const buildWallet = async (walletPath: string): Promise<Wallet> => {
     // Create a new  wallet : Note that wallet is for managing identities.
     let wallet: Wallet;

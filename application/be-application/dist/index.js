@@ -90,13 +90,66 @@ app.post('/registerAdmin', (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(400).send("Error: Wallet creation failed");
     }
 }));
+app.post('/createUserByAdmin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, status } = req.body;
+    try {
+        let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
+        const gatewayOpts = {
+            wallet,
+            identity: 'admin',
+            discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+        };
+        // setup the gateway instance
+        // The user will now be able to create connections to the fabric network and be able to
+        // submit transactions and query. All transactions submitted by this gateway will be
+        // signed by this user using the credentials stored in the wallet.
+        yield gateway.connect(ccp, gatewayOpts);
+        // Build a network instance based on the channel where the smart contract is deployed
+        const network = yield gateway.getNetwork(channelName);
+        // Get the contract from the network.
+        const contract = network.getContract(chaincodeName);
+        const data = {
+            UserId: userId,
+            Status: status
+        };
+        yield contract.submitTransaction('CreateUser', JSON.stringify(data));
+        res.status(200).send(`User Id: ${userId} successfully created`);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send("Error: Fail to persist User");
+    }
+}));
 app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { orgName = 'Org1MSP', userId = 'Kai' } = req.body;
-    const uuid = short_uuid_1.default.generate();
+    try {
+        let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
+        const gatewayOpts = {
+            wallet,
+            identity: 'admin',
+            discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+        };
+        // setup the gateway instance
+        // The user will now be able to create connections to the fabric network and be able to
+        // submit transactions and query. All transactions submitted by this gateway will be
+        // signed by this user using the credentials stored in the wallet.
+        yield gateway.connect(ccp, gatewayOpts);
+        // Build a network instance based on the channel where the smart contract is deployed
+        const network = yield gateway.getNetwork(channelName);
+        // Get the contract from the network.
+        const contract = network.getContract(chaincodeName);
+        yield contract.evaluateTransaction('GetUserbyId', userId);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(404).send('User Id doe not exist');
+        return;
+    }
     // setup the wallet to hold the credentials of the application user
     try {
-        const userWallet = yield (0, AppUtil_1.buildWallet)(userWalletPath);
+        const uuid = short_uuid_1.default.generate();
         const adminWallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
+        const userWallet = yield (0, AppUtil_1.buildWallet)(userWalletPath);
         // Check user Identity exist first and register
         yield (0, CAUtil_1.registerAndEnrollUser)(caClient, adminWallet, userWallet, orgName, uuid, 'org1.department1');
         res.status(200).json({ did: uuid, userId: userId });

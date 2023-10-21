@@ -4,9 +4,39 @@ import sortKeysRecursive from 'sort-keys-recursive';
 import {Certification} from './certification';
 import crypto from 'crypto'
 import lodash from 'lodash'
+import { User } from './user';
 
 @Info({title: 'Certification Service', description: 'Smart contract for certification'})
 export class CertificationServiceContract extends Contract {
+
+	/**
+	 * CreateUser issues a new user Id to the world state with given details.
+	 * 
+	 * @param ctx Context
+	 * @param payload Stringified User payload
+	 * @returns Promise<void>
+	 */
+		@Transaction()
+		public async CreateUser(ctx: Context, payload:string): Promise<void> {
+			const parsePayload: User = JSON.parse(payload);
+			const exists = await this.CertificationExists(ctx, parsePayload.UserId);
+			if (exists) {
+					throw new Error(`The certification for ${parsePayload.UserId} already exists`);
+			}
+	
+			const user:User = {
+				UserId: parsePayload.UserId,
+				Status: parsePayload.Status
+			};
+	
+			try {
+				// we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
+				await ctx.stub.putState(parsePayload.UserId, Buffer.from(stringify(sortKeysRecursive(user))));
+				
+			} catch (error) {
+				throw new Error(`Fail to persist user data: ${payload}`);
+			}
+		}
 
 	/**
 	 * CreateCertification issues a new certification to the world state with given details.
@@ -123,4 +153,23 @@ export class CertificationServiceContract extends Contract {
 		
 		return certificationJSON.toString();
 	}
+
+	/**
+	 * GetUserbyId
+	 * 
+	 * @param ctx Context
+	 * @param userId String
+	 * @returns Promise<string>
+	 */
+		@Transaction(false)
+		@Returns('string')
+		public async GetUserbyId(ctx: Context, userId:string): Promise<string> {
+	
+			const userJSON = await ctx.stub.getState(userId); // get the user from chaincode state
+			if (!userJSON || userJSON.length === 0) {
+					throw new Error(`The user for ${userId} does not exist`);
+			}
+			
+			return userJSON.toString();
+		}
 }

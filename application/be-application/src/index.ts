@@ -57,16 +57,84 @@ app.post('/registerAdmin', async(req: Request, res: Response) => {
 
 });
 
+type UserRequest = {
+	userId: string;
+	status: string;
+}
+app.post('/createUserByAdmin', async(req: Request, res: Response) => {
+	const { userId, status}:UserRequest = req.body;
+	
+	try {
+		let wallet = await readWallet(adminWalletPath);
+		const gatewayOpts: GatewayOptions = {
+			wallet,
+			identity: 'admin',
+			discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+		};
+		
+		// setup the gateway instance
+		// The user will now be able to create connections to the fabric network and be able to
+		// submit transactions and query. All transactions submitted by this gateway will be
+		// signed by this user using the credentials stored in the wallet.
+		await gateway.connect(ccp, gatewayOpts);
+
+		// Build a network instance based on the channel where the smart contract is deployed
+		const network = await gateway.getNetwork(channelName);
+
+		// Get the contract from the network.
+		const contract = network.getContract(chaincodeName);
+
+
+
+		const data = {
+			UserId: userId,
+			Status: status
+		};
+
+		await contract.submitTransaction('CreateUser', JSON.stringify(data));
+		res.status(200).send(`User Id: ${userId} successfully created`);
+	} catch (error) {
+		console.log(error);
+		res.status(400).send("Error: Fail to persist User");
+	}
+});
+
 app.post('/registerUser', async(req: Request, res: Response) => {
 	const {orgName='Org1MSP', userId='Kai'} = req.body;
 
-	const uuid = shortUUID.generate();
+	try {
+		let wallet = await readWallet(adminWalletPath);
+		const gatewayOpts: GatewayOptions = {
+			wallet,
+			identity: 'admin',
+			discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+		};
+		
+		// setup the gateway instance
+		// The user will now be able to create connections to the fabric network and be able to
+		// submit transactions and query. All transactions submitted by this gateway will be
+		// signed by this user using the credentials stored in the wallet.
+		await gateway.connect(ccp, gatewayOpts);
 
+		// Build a network instance based on the channel where the smart contract is deployed
+		const network = await gateway.getNetwork(channelName);
+
+		// Get the contract from the network.
+		const contract = network.getContract(chaincodeName);
+
+		await contract.evaluateTransaction('GetUserbyId', userId);
+		
+	} catch (error) {
+		console.log(error);
+		res.status(404).send('User Id does not exist');
+		return;
+	}
 	// setup the wallet to hold the credentials of the application user
 	try {
-		
+		const uuid = shortUUID.generate();
+		const adminWallet = await readWallet(adminWalletPath);
 		const userWallet = await buildWallet(userWalletPath);
-		const adminWallet = await readWallet(adminWalletPath)
+		
 
 		// Check user Identity exist first and register
 		await registerAndEnrollUser(caClient, adminWallet, userWallet, orgName, uuid, 'org1.department1');
