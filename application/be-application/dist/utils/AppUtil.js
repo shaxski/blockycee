@@ -87,8 +87,8 @@ const buildWallet = (walletPath) => __awaiter(void 0, void 0, void 0, function* 
     // Create a new  wallet : Note that wallet is for managing identities.
     let wallet;
     if (walletPath) {
-        // remove any pre-existing wallet from prior runs
-        fs.rmSync(walletPath, { recursive: true, force: true });
+        // // remove any pre-existing wallet from prior runs
+        // fs.rmSync(walletPath, { recursive: true, force: true });
         wallet = yield fabric_network_1.Wallets.newFileSystemWallet(walletPath);
         console.log(`Built a file system wallet at ${walletPath}`);
     }

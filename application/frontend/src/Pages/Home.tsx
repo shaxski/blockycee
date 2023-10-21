@@ -31,7 +31,7 @@ export default function Home() {
 	
 	const { state } = useLocation();
 	const navigate = useNavigate();
-
+	
 	useEffect(() => {		
 		console.log(privateKey);
 

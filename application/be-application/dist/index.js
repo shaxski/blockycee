@@ -142,7 +142,7 @@ app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
     catch (error) {
         console.log(error);
-        res.status(404).send('User Id doe not exist');
+        res.status(404).send('User Id does not exist');
         return;
     }
     // setup the wallet to hold the credentials of the application user
