@@ -29,7 +29,6 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 			CertificateType: formData.get('certificationType')!.toString(),
 			IssueDate: formData.get('issueDate')!.toString(),
 			ExpiryDate: formData.get('expiryDate')!.toString(),
-			PublicKey: 'adsfsdfsadf' // This need to be created during post createCertification api call
 		}
 		console.log(certifcationData);
 		setCertification(certifcationData)
