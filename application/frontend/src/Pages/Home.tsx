@@ -12,27 +12,31 @@ export type CertificateType = {
 	CertificationId: string;
 }
 
+const initCertification = {
+	"DId": 'asdf',
+	"CertifierId": 'asdf',
+	"IssueDate": "asdf",
+	"CertificateType": "asdf",
+	"ExpiryDate": "asdf",
+	"CertificationId": "asdf",
+}
+
 export default function Home() {
-	const initCertification = {
-		"DId": '',
-    "CertifierId": '',
-    "IssueDate": "",
-    "CertificateType": "",
-    "ExpiryDate": "",
-    "CertificationId":"",
-	}
+
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const [userId, setUserId] = useState<string>('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const [certification, setCertification] = useState<CertificateType>(initCertification);
   const [privateKey, setPrivateKey] = useState<string>('');
-
+	
 	const { state } = useLocation();
 	const navigate = useNavigate();
 
 	useEffect(() => {		
-		setCertification(state.certification);
-		setPrivateKey(state.privateKey)
+		if (state) {
+			setCertification(state.certification);
+			setPrivateKey(state.privateKey)
+		}
 		return () => {
 			setCertification(initCertification)
 			setPrivateKey('')
@@ -79,7 +83,9 @@ export default function Home() {
 			certification: certification,
 			privateKey:privateKey
 		}
-		navigate('/QRCode', {state: qrCodeData})};
+
+		navigate('/QRCode', {state: qrCodeData})
+	};
 	
   return (
 		<div className="App">
