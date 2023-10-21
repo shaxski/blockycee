@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export default function QrCode() {
 	const { state } = useLocation();
 
-	console.log( state);
+	console.log('state QR',state);
 	
 	const navigate = useNavigate();
 	// This need to pass as props

@@ -7,10 +7,11 @@ type RegisterCertificationProps = {
 	dId: string; 
 	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
 	setCertification: React.Dispatch<React.SetStateAction<CertificateType>>
+	setPrivateKey: React.Dispatch<React.SetStateAction<string>>
 } 
 
 export default function RegisterCertification(props:RegisterCertificationProps) {
-	const {dId, setOpenModal, setCertification} = props;
+	const {dId, setOpenModal, setCertification, setPrivateKey} = props;
 	
 	const closeModal = () => setOpenModal(false);
 
@@ -18,6 +19,9 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 	const registerCertification = (certifcationData: CertificateType) => postData("http://localhost:3000/recordCertification",certifcationData)
 	.then((data) => {		
 		setCertification(certifcationData)
+		console.log('data.privateKey',data.privateKey);
+		
+		setPrivateKey(data.privateKey)
 
 		const blob = new Blob([data.privateKey], { type: "text/plain" });
 		const url = URL.createObjectURL(blob);

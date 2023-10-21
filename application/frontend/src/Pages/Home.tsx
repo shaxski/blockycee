@@ -25,14 +25,17 @@ export default function Home() {
 	const [userId, setUserId] = useState<string>('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const [certification, setCertification] = useState<CertificateType>(initCertification);
+  const [privateKey, setPrivateKey] = useState<string>('');
 
 	const { state } = useLocation();
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		setCertification(state);
+	useEffect(() => {		
+		setCertification(state.certification);
+		setPrivateKey(state.privateKey)
 		return () => {
 			setCertification(initCertification)
+			setPrivateKey('')
 		}
 	}, [state]);
 	
@@ -69,13 +72,17 @@ export default function Home() {
 		
 		setUserId(e.target.value)
 	};
-	console.log('cert',certification);
 	
-	const navigateToQRCode = () => navigate('/QRCode', {state:certification});
+	const navigateToQRCode = () => {
+		const qrCodeData = {
+			certification: certification,
+			privateKey:privateKey
+		}
+		navigate('/QRCode', {state: qrCodeData})};
 	
   return (
 		<div className="App">
-			{openModal && <RegisterCertification setOpenModal={setOpenModal} dId={certification.DId} setCertification={setCertification}/>}
+			{openModal && <RegisterCertification setOpenModal={setOpenModal} dId={certification.DId} setCertification={setCertification} setPrivateKey={setPrivateKey}/>}
 			<header>
 				<h1>Welcome to Blockchain Beauty Organization</h1>
 			</header>
