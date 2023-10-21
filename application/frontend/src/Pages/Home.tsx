@@ -41,6 +41,7 @@ export default function Home() {
 	
 
 	const showModal = () => {
+		
 		setOpenModal(true)
 	};
 

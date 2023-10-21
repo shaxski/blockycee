@@ -18,9 +18,7 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 
 	const registerCertification = (certifcationData: CertificateType) => postData("http://localhost:3000/recordCertification",certifcationData)
 	.then((data) => {		
-		setCertification(certifcationData)
-		console.log('data.privateKey',data.privateKey);
-		
+		setCertification(certifcationData)		
 		setPrivateKey(data.privateKey)
 
 		const blob = new Blob([data.privateKey], { type: "text/plain" });
