@@ -131,6 +131,15 @@ header {
 .User-button:hover {
   background-color: #29299e;
 }
+.Ok-button {
+  color: white;
+  background-color: transparent;
+  margin-right: 5rem; 
+  /* background-color: #29299e;  */
+}
+.Ok-button:hover {
+  background-color: #29299e;
+}
 
 .QR-button {
   margin-left: 7%;
@@ -173,6 +182,17 @@ header {
   width: 80%;
   height: 92%;
   left: 10%;
+  border-radius: 10px;
+  border: none;
+}
+.Auth-modal { 
+  background-color: rgb(20, 142, 63);
+  z-index:1; 
+  position: absolute;
+  top: 30%;
+  width: 40%;
+  height: 35%;
+  left: 30%;
   border-radius: 10px;
   border: none;
 }
