@@ -100,17 +100,32 @@ header {
   /* background-color: #3e8e41;  */
   margin-top: 3%;
 }
+.Submit-button {
+  color: white;
+  background-color: transparent; 
+  /* background-color: #d74423;  */
+
+}
+.Submit-button:hover {
+  background-color: #3e8e41; 
+}
+.Back-button {
+  margin-left: 2rem;
+  color: white;
+  background-color: transparent; 
+  /* background-color: #d74423;  */
+
+}
 .Back-button:hover {
   background-color: #d74423; 
 }
-.Back-button {
-  margin-left: 5rem;
+.QR-Back-button {
   color: white;
   background-color: transparent; 
   /* background-color: #d74423;  */
   margin-top: 3%;
 }
-.Back-button:hover {
+.QR-Back-button:hover {
   background-color: #d74423; 
 }
 .Admin-button {

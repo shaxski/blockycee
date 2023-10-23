@@ -24,7 +24,7 @@ export default function QRCode() {
 			</header>
 			<div className="App-body">
 				<QRCodeSVG value={qrText} size={400}/>
-				<button className={"App-button Back-button"} onClick={home}>Back</button>
+				<button className={"App-button QR-Back-button"} onClick={home}>Back</button>
 			</div>
 		</div>
 	);

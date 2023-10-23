@@ -21,8 +21,9 @@ export default function Home() {
 		const form = e.target;				
 		const formData = new FormData(form);
 		const username = formData.get('username')!.toString();
-		const password = formData.get('username')!.toString();
-
+		const password = formData.get('password')!.toString();
+		
+		
 		if (username==="admin" && password==="password") {
 			navigateToAdmin()
 		}
@@ -47,7 +48,7 @@ export default function Home() {
 								</label>
 								<label className='Modal-label' >
 									<h5 className='Modal-text'>Password</h5>
-									<input className='Modal-textField' type="password" />
+									<input className='Modal-textField' type="password" name='password' />
 								</label>
 								<hr className='App-border'/>
 								<button className='App-button Ok-button' type="submit"  value="Submit" >Ok</button>

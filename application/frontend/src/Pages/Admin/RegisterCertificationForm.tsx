@@ -43,6 +43,7 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 			registerCertification(certifcationData)
 			console.log(certifcationData);
 			setSubmitMessage(`Certification has been successfully registered for ${dId}`)
+			closeModal();
 		} catch (error) {
 			setSubmitMessage('')
 		}
@@ -89,8 +90,8 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 				</label>
 				<hr className='App-border'/>
 				<button className='App-button Submit-button' type="submit"  value="Submit" >Submit Certification</button>
+				<button className='App-button Back-button' onClick={closeModal} >Close</button>
 			</form>
-			<button className='App-button Back-button' onClick={closeModal} >Close</button>
 		</div>
 	)
 }

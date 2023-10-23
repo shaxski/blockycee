@@ -43,14 +43,14 @@ export default function User() {
 
 	const getCertification = (dId: string,userId:string) => getData("http://localhost:3000/certification",{ dId: dId, userId: userId})
 	.then((data: any) => {	
-		setCertification(data)
+				setCertification(data)
 		if (data.PublicKey) {
 			return ;
 		}
 		showModal()
 	}).catch((error: any) => {
 		console.log(error);
-		setErrorMessage('Fail to register user')
+		setErrorMessage('Fail to get certification')
 	});
 
 	const handleSubmit = async(e: { preventDefault: () => void }) => {
@@ -79,6 +79,7 @@ export default function User() {
 	const navigateToQRCode = async() => {
 		
 		const makeSignedData = certification;
+		
 		if (makeSignedData.PublicKey) {
 			
 			delete makeSignedData.PublicKey;
@@ -120,7 +121,7 @@ export default function User() {
 						<p className='Message-text'> {errorMessage}</p>
 					</div>
 					)}
-					<button className='App-button Submit-button' onClick={handleSubmit}>Get Certification</button>
+					<button className='App-button QR-button' onClick={handleSubmit}>Get Certification</button>
 					<button className='App-button QR-button' onClick={navigateToQRCode}>QR Code</button>
 				</div>
 			</div>

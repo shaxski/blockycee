@@ -15,7 +15,7 @@ export default function UserVerificationForm(props:UserVerificationFormProps) {
 	const closeModal = () => setOpenModal(false);
 
 	setCertification(certification);
-	const verifyCertification = (verify:boolean, certification: CertificateType) => postData("http://localhost:3000/verifyCertificationByUser",{verify:verify, id:certification.DId})
+	const verifyCertification = async (verify:boolean, certification: CertificateType) => postData("http://localhost:3000/verifyCertificationByUser",{verify:verify, id:certification.DId})
 	.then((data) => {		
 		console.log(data);
 		const blob = new Blob([data.privateKey], { type: "text/plain" });
@@ -30,16 +30,15 @@ export default function UserVerificationForm(props:UserVerificationFormProps) {
 	});
 
 
-	const handleCertificationSubmit = (e: { preventDefault: () => void; target: any; }) => {
+	const handleCertificationSubmit = async (e: { preventDefault: () => void; target: any; }) => {
     // Prevent the browser from reloading the page
     e.preventDefault();
 		
     // Read the form data
 		try {
-			verifyCertification(true,certification)
-			console.log(certification);
+			await verifyCertification(true,certification)
 			setSubmitMessage(`Certification has been successfully verified for ${certification.DId}`)
-			closeModal()
+			closeModal();
 		} catch (error) {
 			setSubmitMessage('')
 		}
