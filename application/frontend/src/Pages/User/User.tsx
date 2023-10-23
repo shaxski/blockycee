@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react'
 import {  useLocation, useNavigate} from 'react-router-dom';
-import { postData } from './api';
-import { CertificateType } from '../models';
+import { CertificateType } from '../../models';
+import { getData, postData } from '../api';
+import UserVerificationForm from './UserVerificationForm';
 
 const initCertification = {
 	"DId": '',
@@ -12,29 +14,25 @@ const initCertification = {
 	"CertificationId": "",
 }
 
-export default function Home() {
+export default function User() {
 
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const [userId, setUserId] = useState<string>('');
+	const [dId, setDId] = useState('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const [certification, setCertification] = useState<CertificateType>(initCertification);
-  const [privateKey, setPrivateKey] = useState<string>('');
 	
 	const { state } = useLocation();
 	const navigate = useNavigate();
 	
 	useEffect(() => {		
-		console.log(privateKey);
-		console.log(openModal);
+		console.log(state);
 		
 		if (state) {
-			
 			setCertification(state);
-			// setPrivateKey(state.privateKey)
 		}
 		return () => {
 			setCertification(initCertification)
-			setPrivateKey('')
 		}
 	}, [state]);
 	
@@ -44,12 +42,11 @@ export default function Home() {
 		setOpenModal(true)
 	};
 
-	const registerUser = (userId:string) => postData("http://localhost:3000/registerUser",{ orgName: "Org1MSP", userId: userId})
-	.then((data) => {		
-		setCertification({...certification, DId: data.did})
-
+	const getCertification = (dId: string,userId:string) => getData("http://localhost:3000/certification",{ dId: dId, userId: userId})
+	.then((data: any) => {		
+		setCertification(data)
 		showModal()
-	}).catch((error) => {
+	}).catch((error: any) => {
 		console.log(error);
 		setErrorMessage('Fail to register user')
 	});
@@ -60,17 +57,22 @@ export default function Home() {
 				
 		setErrorMessage('')	
 		
-		if (userId.length < 4) {
+		if (userId && dId && userId.length < 3) {
 			setErrorMessage('Invalid User Id')
 			return;
 		}
-		await registerUser(userId)
+		await getCertification(dId, userId)
 
   };
-	const handleChange= (e: { preventDefault: () => void; target: { value: React.SetStateAction<string>; }; })=>{
+	const handleUserIdChange= (e: { preventDefault: () => void; target: { value: React.SetStateAction<string>; }; })=>{
 		e.preventDefault();
 		
 		setUserId(e.target.value)
+	};
+	const handleDIdChange= (e: { preventDefault: () => void; target: { value: React.SetStateAction<string>; }; })=>{
+		e.preventDefault();
+		
+		setDId(e.target.value)
 	};
 	
 	const navigateToQRCode = async() => {
@@ -90,7 +92,7 @@ export default function Home() {
 	
   return (
 		<div className="App">
-			{/* {openModal && <RegisterCertification setOpenModal={setOpenModal} dId={certification.DId} setCertification={setCertification} setPrivateKey={setPrivateKey}/>} */}
+			{openModal && <UserVerificationForm setOpenModal={setOpenModal} certification={certification} />}
 			<header>
 				<h1>Welcome to Blockchain Beauty Organization</h1>
 			</header>
@@ -98,7 +100,12 @@ export default function Home() {
 				<div>
 					<label>
 						<h5>
-							User Id: <input className='App-textField' name="userId" value={userId} onChange={handleChange} required/>
+							User Id: <input className='App-textField' name="userId" value={userId} onChange={handleUserIdChange} required/>
+						</h5>
+					</label>
+					<label>
+						<h5>
+							Digital Id: <input className='App-textField' name="dId" value={dId} onChange={handleDIdChange} required/>
 						</h5>
 					</label>
 					<hr />
@@ -107,10 +114,12 @@ export default function Home() {
 						<p className='Message-text'> {errorMessage}</p>
 					</div>
 					)}
-					<button className='App-button Submit-button' onClick={handleSubmit}>Register</button>
+					<button className='App-button Submit-button' onClick={handleSubmit}>Get Certification</button>
 					<button className='App-button QR-button' onClick={navigateToQRCode}>QR Code</button>
 				</div>
 			</div>
 		</div>
   );
 }
+
+

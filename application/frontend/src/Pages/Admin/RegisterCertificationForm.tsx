@@ -1,36 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react'
-import { CertificateType } from './Home';
-import { postData } from './api';
+import React, { useState } from 'react'
+import { postData } from '../api';
+import { CertificateType } from '../../models';
 
 type RegisterCertificationProps = { 
 	dId: string; 
 	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-	setCertification: React.Dispatch<React.SetStateAction<CertificateType>>
-	setPrivateKey: React.Dispatch<React.SetStateAction<string>>
 } 
 
 export default function RegisterCertification(props:RegisterCertificationProps) {
-	const {dId, setOpenModal, setCertification, setPrivateKey} = props;
-	
+	const {dId, setOpenModal} = props;
+	const [submitMessage, setSubmitMessage] = useState('')
 	const closeModal = () => setOpenModal(false);
 
 
-	const registerCertification = (certifcationData: CertificateType) => postData("http://localhost:3000/recordCertification",certifcationData)
+	const registerCertification = (certifcationData: CertificateType) => postData("http://localhost:3000/registerCertification",certifcationData)
 	.then((data) => {		
-		setCertification(certifcationData)		
-		setPrivateKey(data.privateKey)
-
-		const blob = new Blob([data.privateKey], { type: "text/plain" });
-		const url = URL.createObjectURL(blob);
-		const link = document.createElement("a");
-		link.download = `${dId}.pem`;
-		link.href = url;
-		link.click();
-
-		closeModal();
+		console.log(data);
 	}).catch((error) => {
 		console.log(error);
+		setSubmitMessage('')
 	});
 
 
@@ -44,20 +33,31 @@ export default function RegisterCertification(props:RegisterCertificationProps) 
 		
 		const certifcationData = {
 			DId: dId,
-			CertifierId: formData.get('certificationId')!.toString(),
+			CertifierId: formData.get('certifierId')!.toString(),
 			CertificationId: formData.get('certificationId')!.toString(),
 			CertificateType: formData.get('certificationType')!.toString(),
 			IssueDate: formData.get('issueDate')!.toString(),
 			ExpiryDate: formData.get('expiryDate')!.toString(),
 		}
-		registerCertification(certifcationData)
-		console.log(certifcationData);
+		try {
+			registerCertification(certifcationData)
+			console.log(certifcationData);
+			setSubmitMessage(`Certification has been successfully registered for ${dId}`)
+		} catch (error) {
+			setSubmitMessage('')
+		}
+		
   }
 
 	return (
 		<div className='App-modal'>
 			<h1 className='Certification-form'>Certification Form</h1>
 			<hr />
+			{submitMessage.length>0 && (
+					<div className='Message-container '>
+						<p className='Message-text'> {submitMessage}</p>
+					</div>
+					)}
 			<form method="post"  onSubmit={handleCertificationSubmit} >
 				<label className='Modal-label'>
 					<h5 className='Modal-text'> Digital Id: </h5> 
