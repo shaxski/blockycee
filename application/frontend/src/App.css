@@ -58,6 +58,14 @@ header {
   text-align: center;
   vertical-align: middle;
 }
+.Message-succss-container {
+  border-radius: 8px;
+  background: rgb(12, 178, 48);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+}
 .Message-text {
   padding: 1%;
   margin-left: auto;
@@ -86,7 +94,17 @@ header {
   transform: translateY(4px);
 }
 
+.Approved-button {
+  color: white;
+  background-color: transparent; 
+  /* background-color: #3e8e41;  */
+  margin-top: 3%;
+}
+.Back-button:hover {
+  background-color: #d74423; 
+}
 .Back-button {
+  margin-left: 5rem;
   color: white;
   background-color: transparent; 
   /* background-color: #d74423;  */
@@ -95,14 +113,35 @@ header {
 .Back-button:hover {
   background-color: #d74423; 
 }
-.Submit-button {
+.Admin-button {
   color: white;
   background-color: transparent; 
   /* background-color: #29299e;  */
 }
-.Submit-button:hover {
+.Admin-button:hover {
   background-color: #29299e;
 }
+
+.User-button {
+  color: white;
+  background-color: transparent;
+  margin-right: 5rem; 
+  /* background-color: #29299e;  */
+}
+.User-button:hover {
+  background-color: #29299e;
+}
+
+.QR-button {
+  margin-left: 7%;
+  color: white;
+  background-color: transparent; 
+  /* background-color: #4CAF50;  */
+}
+.QR-button:hover {
+  background-color: #4CAF50; 
+}
+
 .QR-button {
   margin-left: 7%;
   color: white;

@@ -6,14 +6,15 @@ import { CertificateType } from '../../models';
 type UserVerificationFormProps = { 
 	certification: CertificateType; 
 	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+	setCertification:  React.Dispatch<React.SetStateAction<CertificateType>>
 } 
 
 export default function UserVerificationForm(props:UserVerificationFormProps) {
-	const {certification, setOpenModal} = props;
-	const [submitMessage, setSubmitMessage] = useState('')
+	const {certification, setOpenModal, setCertification} = props;
+	const [submitMessage, setSubmitMessage] = useState('');
 	const closeModal = () => setOpenModal(false);
 
-
+	setCertification(certification);
 	const verifyCertification = (verify:boolean, certification: CertificateType) => postData("http://localhost:3000/verifyCertificationByUser",{verify:verify, id:certification.DId})
 	.then((data) => {		
 		console.log(data);
@@ -84,7 +85,7 @@ export default function UserVerificationForm(props:UserVerificationFormProps) {
 					<input className='Modal-dateField' type='Date'  defaultValue={certification.ExpiryDate} name="expiryDate" required/>
 				</label>
 				<hr className='App-border'/>
-				<button className='App-button Submit-button' type="submit"  value="Submit" >Approved</button>
+				<button className='App-button Approved-button' type="submit"  value="Submit" >Approved</button>
 				<button className='App-button Back-button' onClick={rejectCertification} >Reject</button>
 			</form>
 	

@@ -26,9 +26,8 @@ export default function User() {
 	const navigate = useNavigate();
 	
 	useEffect(() => {		
-		console.log(state);
-		
-		if (state) {
+			
+		if (state ) {
 			setCertification(state);
 		}
 		return () => {
@@ -43,8 +42,11 @@ export default function User() {
 	};
 
 	const getCertification = (dId: string,userId:string) => getData("http://localhost:3000/certification",{ dId: dId, userId: userId})
-	.then((data: any) => {		
+	.then((data: any) => {	
 		setCertification(data)
+		if (data.PublicKey) {
+			return ;
+		}
 		showModal()
 	}).catch((error: any) => {
 		console.log(error);
@@ -62,7 +64,6 @@ export default function User() {
 			return;
 		}
 		await getCertification(dId, userId)
-
   };
 	const handleUserIdChange= (e: { preventDefault: () => void; target: { value: React.SetStateAction<string>; }; })=>{
 		e.preventDefault();
@@ -77,6 +78,11 @@ export default function User() {
 	
 	const navigateToQRCode = async() => {
 		
+		const makeSignedData = certification;
+		if (makeSignedData.PublicKey) {
+			
+			delete makeSignedData.PublicKey;
+		}
 		if (certification.DId || certification.DId.length) {
 			const value = await postData("http://localhost:3000/generateSignedData",{ DId: certification.DId, SignedData: certification})
 
@@ -87,12 +93,12 @@ export default function User() {
 			
 			navigate('/QRCode', {state: qrCodeData});
 		}
-		setErrorMessage('Missing Digital Id. Please Create one');
+		setErrorMessage('Certification Info does not exit please get certification');
 	};
 	
   return (
 		<div className="App">
-			{openModal && <UserVerificationForm setOpenModal={setOpenModal} certification={certification} />}
+			{openModal && <UserVerificationForm setOpenModal={setOpenModal} certification={certification} setCertification={setCertification}/>}
 			<header>
 				<h1>Welcome to Blockchain Beauty Organization</h1>
 			</header>

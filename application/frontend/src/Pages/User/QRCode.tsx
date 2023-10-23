@@ -2,11 +2,11 @@ import React from 'react'
 import { QRCodeSVG } from 'qrcode.react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-export default function QrCode() {
+export default function QRCode() {
 	const { state } = useLocation();
 
-	console.log('state QR', state.encryptData);
-	console.log(state.certification.DId);
+	console.log('QR encryptData: ', state.encryptData);
+	console.log('QR DId: ', state.certification.DId);
 	
 	const navigate = useNavigate();
 	// This need to pass as props
@@ -15,7 +15,7 @@ export default function QrCode() {
 		"SignedData": state.encryptData
 	});
 
-	const home = () => navigate('/', {state:{...state.certification}});
+	const home = () => navigate('/user', {state:{...state.certification}});
 
 	return (
 		<div className="App">

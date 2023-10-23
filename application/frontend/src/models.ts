@@ -1,4 +1,5 @@
 export type CertificateType = {
+	PublicKey?: string;
 	DId: string;
 	CertifierId: string;
 	IssueDate: string;
