@@ -76,6 +76,7 @@ const ccp = (0, AppUtil_1.buildCCPOrg1)();
 // the information in the network configuration
 const caClient = (0, CAUtil_1.buildCAClient)(ccp, 'ca.org1.example.com');
 const gateway = new fabric_network_1.Gateway();
+// Admin API 
 app.post('/registerAdmin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { orgName = 'Org1MSP', userId = 'admin' } = req.body;
     // setup the wallet to hold the credentials of the application admin user
@@ -92,6 +93,7 @@ app.post('/registerAdmin', (req, res) => __awaiter(void 0, void 0, void 0, funct
 }));
 app.post('/createUserByAdmin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, status } = req.body;
+    const orgName = 'Org1MSP';
     try {
         let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
         const gatewayOpts = {
@@ -108,16 +110,50 @@ app.post('/createUserByAdmin', (req, res) => __awaiter(void 0, void 0, void 0, f
         const network = yield gateway.getNetwork(channelName);
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
+        // Create DID
+        const uuid = short_uuid_1.default.generate();
+        const userWallet = yield (0, AppUtil_1.buildWallet)(userWalletPath);
+        // Check user Identity exist first and register
+        yield (0, CAUtil_1.registerAndEnrollUser)(caClient, wallet, userWallet, orgName, uuid, 'org1.department1');
         const data = {
             UserId: userId,
-            Status: status
+            Status: status,
+            DId: uuid
         };
         yield contract.submitTransaction('CreateUser', JSON.stringify(data));
-        res.status(200).send(`User Id: ${userId} successfully created`);
+        res.status(200).json({ did: uuid, userId: userId });
     }
     catch (error) {
         console.log(error);
-        res.status(400).send("Error: Fail to persist User");
+        res.status(400).send(`Error: Fail to associate ${userId} with DId`);
+    }
+}));
+app.post('/registerCertification', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const _a = req.body, { DId, CertifierId, CertificationId, IssueDate, CertificateType, ExpiryDate } = _a, params = __rest(_a, ["DId", "CertifierId", "CertificationId", "IssueDate", "CertificateType", "ExpiryDate"]);
+    try {
+        let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
+        const gatewayOpts = {
+            wallet,
+            identity: 'admin',
+            discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+        };
+        // setup the gateway instance
+        // The user will now be able to create connections to the fabric network and be able to
+        // submit transactions and query. All transactions submitted by this gateway will be
+        // signed by this user using the credentials stored in the wallet.
+        yield gateway.connect(ccp, gatewayOpts);
+        // Build a network instance based on the channel where the smart contract is deployed
+        const network = yield gateway.getNetwork(channelName);
+        // Get the contract from the network.
+        const contract = network.getContract(chaincodeName);
+        const data = Object.assign({}, req.body);
+        // fs.appendFileSync(`./${DId}.pem`,privateKey)
+        yield contract.submitTransaction('CreateCertification', JSON.stringify(data));
+        res.status(200).send(`Certification has been successfully created. Data: ${JSON.stringify(data)}`);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send("Error: Fail to persist Certification");
     }
 }));
 app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -159,11 +195,38 @@ app.post('/registerUser', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(400).send("Error: Wallet creation failed");
     }
 }));
-app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const _a = req.body, { DId, CertifierId, CertificationId, IssueDate, CertificateType, ExpiryDate, PublicKey } = _a, params = __rest(_a, ["DId", "CertifierId", "CertificationId", "IssueDate", "CertificateType", "ExpiryDate", "PublicKey"]);
-    const isUserExist = (0, AppUtil_1.checkIdentity)(userWalletPath, DId);
-    if (!isUserExist) {
-        res.status(404).send("Digital Id not found");
+const getCertificationData = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
+        const gatewayOpts = {
+            wallet,
+            identity: 'admin',
+            discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+        };
+        // setup the gateway instance
+        // The user will now be able to create connections to the fabric network and be able to
+        // submit transactions and query. All transactions submitted by this gateway will be
+        // signed by this user using the credentials stored in the wallet.
+        yield gateway.connect(ccp, gatewayOpts);
+        // Build a network instance based on the channel where the smart contract is deployed
+        const network = yield gateway.getNetwork(channelName);
+        // Get the contract from the network.
+        const contract = network.getContract(chaincodeName);
+        const result = yield contract.evaluateTransaction('GetCertificationByDId', id);
+        const certification = JSON.parse(result.toString());
+        return certification;
+    }
+    catch (error) {
+        return '';
+    }
+    ;
+});
+// User API
+app.post('/verifyCertificationByUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const certification = yield getCertificationData(req.body.id);
+    if (certification && (certification === null || certification === void 0 ? void 0 : certification.PublicKey)) {
+        res.status(400).send("Error: Certification already verified");
+        return;
     }
     try {
         let wallet = yield (0, AppUtil_1.readWallet)(adminWalletPath);
@@ -192,38 +255,23 @@ app.post('/recordCertification', (req, res) => __awaiter(void 0, void 0, void 0,
                 format: 'pem'
             }
         });
-        const data = Object.assign(Object.assign({}, req.body), { PublicKey: publicKey });
-        fs_1.default.appendFileSync(`./${DId}.pem`, privateKey);
-        yield contract.submitTransaction('CreateCertification', JSON.stringify(data));
-        res.status(200).json({
-            privateKey: privateKey
-        });
+        const updatedCertification = Object.assign(Object.assign({}, certification), { PublicKey: publicKey });
+        const data = {
+            verify: req.body.verify,
+            certification: updatedCertification
+        };
+        yield contract.submitTransaction('VerifyCertificationByUser', JSON.stringify(data));
+        fs_1.default.appendFileSync(`./${data.certification.DId}.pem`, privateKey);
+        res.status(200).json({ privateKey: privateKey });
     }
     catch (error) {
         console.log(error);
         res.status(400).send("Error: Fail to persist Certification");
     }
 }));
-app.post('/generateSignedData', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { DId, SignedData } = req.body;
-    const privateKey = fs_1.default.readFileSync(`./${DId}.pem`, { encoding: "utf8" });
-    const str = JSON.stringify(SignedData);
-    const buff = Buffer.from(str, "utf-8");
-    const encryptData = crypto_1.default.privateEncrypt(privateKey, buff);
-    try {
-        res.status(200).json({
-            encryptData: encryptData.toString('base64')
-        });
-    }
-    catch (error) {
-        console.log(error);
-        res.status(400).send({
-            encryptData: ''
-        });
-    }
-}));
-app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const dId = req.params.id;
+app.get('/certification/:dId&:userId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const dId = req.params.dId;
+    const userId = req.params.userId;
     const isUserExist = (0, AppUtil_1.checkIdentity)(userWalletPath, dId);
     if (!isUserExist) {
         res.status(404).send("Digital Id not found");
@@ -244,6 +292,7 @@ app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         const network = yield gateway.getNetwork(channelName);
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
+        yield contract.evaluateTransaction('GetUser', `${userId}-${dId}`);
         let result = yield contract.evaluateTransaction('GetCertificationByDId', dId);
         console.log(`*** Result: ${(0, AppUtil_1.prettyJSONString)(result.toString())}`);
         res.status(200).json(JSON.parse(result.toString()));
@@ -253,7 +302,25 @@ app.get('/certification/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.status(404).send("Error: Not Found");
     }
 }));
-app.post('/verifyCertification', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post('/generateSignedData', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { DId, SignedData } = req.body;
+    const privateKey = fs_1.default.readFileSync(`./${DId}.pem`, { encoding: "utf8" });
+    const str = JSON.stringify(SignedData);
+    const buff = Buffer.from(str, "utf-8");
+    const encryptData = crypto_1.default.privateEncrypt(privateKey, buff);
+    try {
+        res.status(200).json({
+            encryptData: encryptData.toString('base64')
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send({
+            encryptData: ''
+        });
+    }
+}));
+app.post('/verifyQR', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // User create private and public key on their app and send public as payload 
     // This will persist on chain when recordCertification api call
     // Laster during verification Other organization will use these public to validate data.

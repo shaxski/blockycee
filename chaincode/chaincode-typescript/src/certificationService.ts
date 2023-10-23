@@ -18,25 +18,46 @@ export class CertificationServiceContract extends Contract {
 	 */
 		@Transaction()
 		public async CreateUser(ctx: Context, payload:string): Promise<void> {
-			const parsePayload: User = JSON.parse(payload);
+			const parsePayload = JSON.parse(payload);
 			const exists = await this.CertificationExists(ctx, parsePayload.UserId);
 			if (exists) {
 					throw new Error(`The certification for ${parsePayload.UserId} already exists`);
 			}
 	
 			const user:User = {
-				UserId: parsePayload.UserId,
-				Status: parsePayload.Status
+				Id: `${parsePayload.UserId}-${parsePayload.DId}`,
+				Status: parsePayload.Status,
+				DId: parsePayload.DId
 			};
 	
 			try {
 				// we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
-				await ctx.stub.putState(parsePayload.UserId, Buffer.from(stringify(sortKeysRecursive(user))));
+				await ctx.stub.putState(user.Id, Buffer.from(stringify(sortKeysRecursive(user))));
 				
 			} catch (error) {
 				throw new Error(`Fail to persist user data: ${payload}`);
 			}
 		}
+
+	/**
+	 * GetUSer
+	 * 
+	 * @param ctx Context
+	 * @param compositeId String
+	 * @returns Promise<string>
+	 */
+	@Transaction(false)
+	@Returns('string')
+	public async GetUser(ctx: Context, compositeId:string): Promise<string> {
+
+		const certificationJSON = await ctx.stub.getState(compositeId); // get the certification from chaincode state
+		if (!certificationJSON || certificationJSON.length === 0) {
+				throw new Error(`The certification for ${compositeId} does not exist`);
+		}
+		
+		return certificationJSON.toString();
+	}
+
 
 	/**
 	 * CreateCertification issues a new certification to the world state with given details.
@@ -64,6 +85,44 @@ export class CertificationServiceContract extends Contract {
 		} catch (error) {
 			throw new Error(`Fail to persist data: ${payload}`);
 		}
+	}
+
+	/**
+	 * VerifyCertificationByUser verify certification to the world state with given details.
+	 * 
+	 * @param ctx Context
+	 * @param payload Stringified Certification and verify payload
+	 * @returns Promise<boolean>
+	 */
+	@Transaction()
+	@Returns('boolean')
+	public async VerifyCertificationByUser(ctx: Context, payload:string): Promise<boolean> {
+		const parsePayload:{
+			verify: boolean,
+			certification: Certification
+		 } = JSON.parse(payload);
+		try {
+			await ctx.stub.deleteState(parsePayload.certification.DId)
+		} catch (error) {
+			console.log(`Fail to remove data: ${parsePayload.certification.DId}`);
+			return false;
+			
+		}
+		if (parsePayload.verify) {
+			const verifiedRecord:Certification = {
+				...parsePayload.certification
+			};
+
+			try {
+				// we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
+				await ctx.stub.putState(verifiedRecord.DId, Buffer.from(stringify(sortKeysRecursive(verifiedRecord))));
+				return 
+			} catch (error) {
+				console.log(`Fail to persist data: ${payload}`);
+				return false;
+			}
+		}
+		return false
 	}
 
 	/**

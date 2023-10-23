@@ -5,6 +5,5 @@ export type CertificationRequest = {
 	CertificateType: 'Type A' | 'Type B' | 'Type C';
 	IssueDate: string;
 	ExpiryDate: string;
-	PublicKey: string;
 	[key:string]: string;
 }
