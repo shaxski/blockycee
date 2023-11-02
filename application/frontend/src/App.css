@@ -200,6 +200,17 @@ header {
   border-radius: 10px;
   border: none;
 }
+.QR-modal { 
+  background-color: rgb(67, 129, 162);
+  z-index:1; 
+  position: absolute;
+  top: 10%;
+  width: 60%;
+  height: 80%;
+  left: 20%;
+  border-radius: 10px;
+  border: none;
+}
 .Auth-modal { 
   background-color: rgb(20, 142, 63);
   z-index:1; 

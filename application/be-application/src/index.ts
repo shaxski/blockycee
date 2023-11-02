@@ -296,7 +296,7 @@ app.get('/certification/:dId&:userId', async(req: Request, res: Response) => {
 
 	try {
 		let wallet = await readWallet(adminWalletPath);
-		const gatewayOpts: GatewayOptions = {
+				const gatewayOpts: GatewayOptions = {
 			wallet,
 			identity: 'admin',
 			discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
